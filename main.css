@@ -1,0 +1,40 @@
+html {
+  background: #181a1b;
+  color: #e8e6e3;
+}
+
+
+/* Initial screen */
+#title {
+  text-align: center;
+}
+
+#btn_start {
+  display: inline-block;
+  padding: 0.35em 1.2em;
+  border: 0.1em solid #FFFFFF;
+  margin: 0 0.3em 0.3em 0;
+  border-radius: 0.12em;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  color: #FFFFFF;
+  /* for some reason it was not transparent on firefox? */
+  background-color: transparent;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+#btn_start:hover {
+  color: #000000;
+  background-color: #FFFFFF;
+}
+/* for mobile */
+
+@media all and (max-width: 30em) {
+  #btn_start {
+    display: block;
+    margin: 0.4em auto;
+  }
+}
