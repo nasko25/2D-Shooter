@@ -1,0 +1,11 @@
+{
+  "name": "2D Shooter",
+  "version": "1.0.0",
+  "description": "This is a game for a school project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
