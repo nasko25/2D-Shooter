@@ -1,17 +1,17 @@
 html {
   background: #181a1b;
   color: #e8e6e3;
+  width: 100%;
 }
 
-
 /* Initial screen */
-#title {
+.title {
   text-align: center;
 }
 
 #btn_start {
-  display: inline-block;
-  padding: 0.35em 1.2em;
+  /* display: inline-block;*/
+  padding: 0.7em 1.6em;
   border: 0.1em solid #FFFFFF;
   margin: 0 0.3em 0.3em 0;
   border-radius: 0.12em;
@@ -24,6 +24,10 @@ html {
   background-color: transparent;
   text-align: center;
   transition: all 0.2s;
+  /*----------------------------------------------*/
+  position: absolute;
+  bottom: 5em;
+  right: 4em;
 }
 
 #btn_start:hover {
@@ -38,3 +42,23 @@ html {
     margin: 0.4em auto;
   }
 }
+
+/* Columns */
+
+#col1, #col2, #col3 {
+  margin-left: 7%;
+  border: 0.1em solid #FFFFFF;
+  border-radius: 0.12em;
+  float: left;
+  width: 25%;
+  overflow: auto;
+  height: 75%;
+}
+
+/* #col3 {
+    width: 25%;
+    margin-left: 7%;
+    float: left;
+    border: 0.1em solid #FFFFFF;
+    border-radius: 0.12em;
+} */
