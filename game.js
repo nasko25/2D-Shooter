@@ -2,7 +2,7 @@ var socket = new WebSocket("ws://localhost:8080/index.js")
 
 var Images = {};
 Images.player = new Image();
-Images.player.src = "img/player";
+Images.player.src = "img/player.png";
 Images.bullet = new Image();
 Images.bullet.src = "img/bullet";
 Images.map = new Image();

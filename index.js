@@ -31,6 +31,13 @@ http.createServer(function(req, res){
 	else if (req.url === "/index.js") {
 		wss.handleUpgrade(req, req.socket, Buffer.alloc(0), onConnect);
 	}
+	else if (req.url === "/img/player.png") {
+		fs.readFile("img/player.png", function(err, data) {
+			res.writeHead(200, {"Content-Type":"image/png"});
+			res.write(data);
+			res.end();
+		});
+	}
 	else {
 		fs.readFile("index.html", function(err, data){
 			res.writeHead(200, {"Content-Type":"text/html"});
