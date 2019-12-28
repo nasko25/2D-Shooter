@@ -58,11 +58,49 @@ Player.list = {};
 
 var self_id = null;
 
-socket.onopen = function() {
-  socket.send("asdf from client");
+socket.onopen = function(data) {
+  // ...
 }
 socket.onmessage = function(data) {
-  alert(data.data);
+  // if it is the first ever message from the server socket
+  if (data.is_initial_message) {
+    if (data.self_id) {
+      self_id = data.self_id;
+    }
+
+    for (var i = 0; i < data.players.length; i++) {
+      new Player(data.players[i]);
+    }
+  }
+  // update players' positions
+  else if (data.is_update_message){
+    // { players : [{id:1, x:0, y:0}, {id:1337, x:0, y:0}], bullet : []}
+    for (var i = 0; i < data.players.length; i++) {
+     var pack = data.players[i];
+     var p = Player.list[pack.id];
+     if (p) {
+       if (pack.x !== undefined)
+         p.x = pack.x;
+       if (pack.y !== undefined)
+         p.y = pack.y;
+       if (pack.hp !== undefined)
+         p.hp = pack.hp;
+       if (pack.score !== undefined)
+         p.score = pack.score;
+       if (pack.map !== undefined)
+         p.map = pack.map;
+     }
+    }
+  }
+  // when a player has died/disconnected
+  else if (data.is_remove_message) {
+    // {players:[123]
+       for (var i = 0; i < data.players.length; i++) {
+         delete Player.list[data.players[i]];
+       }
+  }
+
+  // alert(data.data);
 }
 
 /* close the socket */
