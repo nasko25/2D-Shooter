@@ -58,6 +58,12 @@ Player.list = {};
 
 var self_id = null;
 
+socket.onopen = function() {
+  // ... do something
+}
+socket.onmessage = function(data) {
+  alert(data.data);
+}
 
 /* close the socket */
 // socket.close(1000, "Work complete");
