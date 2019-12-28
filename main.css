@@ -68,12 +68,6 @@ html {
   padding-left: 2.8em;
 }
 
-#game {
-  width: 100%;
-  /* to center it */
-  margin: auto;
-}
-
 #canv {
   padding-left: 0;
   padding-right: 0;

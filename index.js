@@ -1,11 +1,9 @@
 const http = require("http");
 const url = require("url");
-const fs = require("fs")
-const ws = require("ws")
+const fs = require("fs");
+const WebSocketServer = require("websocket").server;
 
-const wss = new ws.Server({noServer: true});
-
-http.createServer(function(req, res){
+var server = http.createServer(function(req, res){
 	if (req.url === "/main.css") {
 		fs.readFile("main.css", function(err, data){
 			res.writeHead(200, {"Content-Type":"text/css"});
@@ -26,10 +24,6 @@ http.createServer(function(req, res){
 			res.write(data);
 			res.end();
 		});
-	}
-	// websocket request
-	else if (req.url === "/index.js") {
-		wss.handleUpgrade(req, req.socket, Buffer.alloc(0), onConnect);
 	}
 	else if (req.url === "/img/player.png") {
 		fs.readFile("img/player.png", function(err, data) {
@@ -52,6 +46,9 @@ http.createServer(function(req, res){
 	}
 }).listen(8080);
 
-var onConnect = function(ws) {
-	ws.close(1000, "Bye!")
-}
+WSServer = new WebSocketServer({
+    httpServer: server,
+    autoAcceptConnections: false
+});
+
+// WSServer.on('request', function(request) { ...
