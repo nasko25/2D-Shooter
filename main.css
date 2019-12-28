@@ -52,7 +52,7 @@ html {
   float: left;
   width: 25%;
   overflow: auto;
-  height: 75%;
+  height: 75vh;     /* vs 75% */
 }
 
 /* #col3 {
@@ -62,3 +62,21 @@ html {
     border: 0.1em solid #FFFFFF;
     border-radius: 0.12em;
 } */
+
+.list {
+  font-size: 1.5em;
+  padding-left: 2.8em;
+}
+
+#game {
+  width: 55vw;
+  height: 75vh;
+  /* to center it */
+  margin: auto;
+}
+
+#canv {
+  width: inherit;
+  height: inherit;
+  background: white;
+}
