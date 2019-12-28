@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "nodemon": "^2.0.2"
+    "local-web-server": "^3.0.7",
+    "nodemon": "^2.0.2",
+    "ws": "^7.2.1"
   }
 }

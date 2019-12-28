@@ -1,9 +1,11 @@
-var http = require("http");
-var url = require("url");
-var fs = require("fs")
+const http = require("http");
+const url = require("url");
+const fs = require("fs")
+const ws = require("ws")
+
+const wss = new ws.Server({noServer: true});
 
 http.createServer(function(req, res){
-
 	if (req.url === "/main.css") {
 		fs.readFile("main.css", function(err, data){
 			res.writeHead(200, {"Content-Type":"text/css"});
@@ -18,6 +20,17 @@ http.createServer(function(req, res){
 			res.end();
 		});
 	}
+	else if (req.url === "/game.js") {
+		fs.readFile("game.js", function(err, data){
+			res.writeHead(200, {"Content-Type":"text/javascript"});
+			res.write(data);
+			res.end();
+		});
+	}
+	// websocket request
+	else if (req.url === "/index.js") {
+		wss.handleUpgrade(req, req.socket, Buffer.alloc(0), onConnect);
+	}
 	else {
 		fs.readFile("index.html", function(err, data){
 			res.writeHead(200, {"Content-Type":"text/html"});
@@ -31,3 +44,7 @@ http.createServer(function(req, res){
 		});
 	}
 }).listen(8080);
+
+var onConnect = function(ws) {
+	ws.close(1000, "Bye!")
+}
