@@ -59,7 +59,7 @@ Player.list = {};
 var self_id = null;
 
 socket.onopen = function() {
-  // ... do something
+  socket.send("asdf from client");
 }
 socket.onmessage = function(data) {
   alert(data.data);
