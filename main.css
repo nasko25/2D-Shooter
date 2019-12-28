@@ -69,14 +69,16 @@ html {
 }
 
 #game {
-  width: 55vw;
-  height: 75vh;
+  width: 100%;
   /* to center it */
   margin: auto;
 }
 
 #canv {
-  width: inherit;
-  height: inherit;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
   background: white;
 }

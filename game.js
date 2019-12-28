@@ -8,12 +8,20 @@ Images.bullet.src = "img/bullet";
 Images.map = new Image();
 Images.map.src = "img/map";
 
-// TODO:
-var canvas = document.getElementById("canv"); //.getContext("2d");
-canvas.width = document.getElementById("canv").style.width;
-var WIDTH = canvas.width;
-var HEIGHT = canvas.height;
-console.log(canvas.width +"; "+ HEIGHT);
+function resize(){
+  document.getElementById("canv").width = window.innerWidth*0.65;
+  document.getElementById("canv").height = window.innerHeight*0.75;
+  var WIDTH = document.getElementById("canv").width;
+  var HEIGHT = document.getElementById("canv").height;
+  console.log(WIDTH+"; "+ HEIGHT);
+  canvas.beginPath();
+  canvas.rect(20, 20, 150, 100);
+  canvas.stroke();
+}
+
+var canvas = document.getElementById("canv").getContext("2d");
+window.addEventListener('resize', resize);
+resize();
 
 var Player = function(initilize){
   var self = {};
