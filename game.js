@@ -11,14 +11,16 @@ Images.map.src = "img/map";
 function resize(){
   document.getElementById("canv").width = window.innerWidth*0.65;
   document.getElementById("canv").height = window.innerHeight*0.75;
-  var WIDTH = document.getElementById("canv").width;
-  var HEIGHT = document.getElementById("canv").height;
+  WIDTH = document.getElementById("canv").width;
+  HEIGHT = document.getElementById("canv").height;
   console.log(WIDTH+"; "+ HEIGHT);
   canvas.beginPath();
   canvas.rect(20, 20, 150, 100);
   canvas.stroke();
 }
 
+var WIDTH = document.getElementById("canv").width;
+var HEIGHT = document.getElementById("canv").height;
 var canvas = document.getElementById("canv").getContext("2d");
 window.addEventListener('resize', resize);
 resize();
@@ -102,6 +104,17 @@ socket.onmessage = function(data) {
 
   // alert(data.data);
 }
+
+setInterval(function() {
+  // if no initial package has been recieved yet
+  if (!self_id)
+    return;
+
+  canvas.clearRect(0, 0, WIDTH, HEIGHT);
+  for (var i in Player.list){
+    Player.list[i].draw();
+  }
+}, 100);
 
 /* close the socket */
 // socket.close(1000, "Work complete");
