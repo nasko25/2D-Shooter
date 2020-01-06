@@ -64,6 +64,7 @@ socket.onopen = function(data) {
   // ...
 }
 socket.onmessage = function(data) {
+  alert(JSON.parse(data.data)[0] + "; id = " + JSON.parse(data.data)[1].id + ", name = " + JSON.parse(data.data)[1].name);
   // if it is the first ever message from the server socket
   if (data.is_initial_message) {
     if (data.self_id) {
