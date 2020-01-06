@@ -62,7 +62,7 @@ var websockets = {};
 
 wss.on("connection", function(ws) {
 	ws.on("message", function(message) {
-
+		//console.log(JSON.parse(message))
 	});
 	msg = ["init", {id:"0123", name:"asd"}];
 	ws.send(JSON.stringify(msg));
