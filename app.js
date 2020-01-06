@@ -53,6 +53,26 @@ var server = http.createServer(function(req, res){
 	}
 }).listen(8080);
 
+// player
+Player = function() {
+	var self = {
+    speed_x: 0,
+    speed_y: 0,
+    max_speed: 10,
+    id: "",
+    map_x: 0,
+    map_y: 0,
+    pressingLeft: false,
+    pressingRight: false,
+    pressingUp: false,
+    pressingDown: false,
+    is_hit: false
+  };
+  self.x = WIDTH/2 - self.image.width/2;
+  self.y = HEIGHT/2 - self.image.height/2;
+	return self;
+}
+
 
 // communication
 const wss = new ws.Server({ server });

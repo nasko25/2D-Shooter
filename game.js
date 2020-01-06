@@ -4,14 +4,12 @@ var WIDTH = document.getElementById("canv").width;
 var HEIGHT = document.getElementById("canv").height;
 
 function draw(){
-
-  socket.send(JSON.stringify(["init", p]));
-
   document.getElementById("canv").width = window.innerWidth*0.65;
   document.getElementById("canv").height = window.innerHeight*0.75;
   WIDTH = document.getElementById("canv").width;
   HEIGHT = document.getElementById("canv").height;
   console.log(WIDTH+"; "+ HEIGHT);
+  socket.send(JSON.stringify(["screen_size", {WIDTH:WIDTH, HEIGHT:HEIGHT}]));
   p.draw(canvas);
 }
 
