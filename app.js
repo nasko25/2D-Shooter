@@ -1,4 +1,3 @@
-require("./Player.js")
 const http = require("http");
 const url = require("url");
 const fs = require("fs");
@@ -33,6 +32,13 @@ var server = http.createServer(function(req, res){
 			res.end();
 		});
 	}
+	else if (req.url === "/img/map.png") {
+		fs.readFile("img/map.png", function(err, data) {
+			res.writeHead(200, {"Content-Type":"image/png"});
+			res.write(data);
+			res.end();
+		});
+	}
 	else {
 		fs.readFile("index.html", function(err, data){
 			res.writeHead(200, {"Content-Type":"text/html"});
@@ -47,6 +53,8 @@ var server = http.createServer(function(req, res){
 	}
 }).listen(8080);
 
+
+// communication
 const wss = new ws.Server({ server });
 
 /* TODO clean unused websockets ! */
