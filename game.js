@@ -4,6 +4,9 @@ var WIDTH = document.getElementById("canv").width;
 var HEIGHT = document.getElementById("canv").height;
 
 function draw(){
+
+  socket.send(JSON.stringify(["init", p]));
+
   document.getElementById("canv").width = window.innerWidth*0.65;
   document.getElementById("canv").height = window.innerHeight*0.75;
   WIDTH = document.getElementById("canv").width;
@@ -109,9 +112,6 @@ socket.onmessage = function(data) {
 }
 
 setInterval(() => {
-
-  socket.send(JSON.stringify(p));
-
   canvas.clearRect(0, 0, WIDTH, HEIGHT);
   p.updatePosition();
   p.draw(canvas);
