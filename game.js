@@ -122,14 +122,13 @@ socket.onopen = function(data) {
 socket.onmessage = function(data) {
   //alert(JSON.parse(data.data)[0] + "; id = " + JSON.parse(data.data)[1].id + ", name = " + JSON.parse(data.data)[1].name);
   // if it is the first ever message from the server socket
-  console.log(JSON.parse(data.data)[1].player.id)
   if (JSON.parse(data.data)[0] === "init") {
     p = Player(JSON.parse(data.data)[1].player.id);
-    console.log(p)
-    p.draw(canvas);
-    p.draw(canvas);
-    p.draw(canvas);
-    p.draw(canvas);
+    // give it time to fetch the images
+    setTimeout(()=>{
+      canvas.clearRect(0, 0, WIDTH, HEIGHT);
+      p.draw(canvas);
+    }, 40);
   }
   if (JSON.parse(data.data)[0] === "move") {
     if (JSON.parse(data.data)[1].player.id === p.id) {
