@@ -54,8 +54,12 @@ var server = http.createServer(function(req, res){
 }).listen(8080);
 
 // player
+var prev_x = 0;
+var prev_y = 0;
 Player = function() {
 	var self = {
+		x: 0,
+		y: 0,
     speed_x: 0,
     speed_y: 0,
     max_speed: 10,
@@ -68,8 +72,36 @@ Player = function() {
     pressingDown: false,
     is_hit: false
   };
-  self.x = WIDTH/2 - self.image.width/2;
-  self.y = HEIGHT/2 - self.image.height/2;
+
+	self.updatePosition = function() {
+    // TODO rotate the image!
+
+    // change the offset for the map
+    if (self.pressingLeft)
+      self.speed_x = self.max_speed;
+    if (self.pressingRight)
+      self.speed_x = -self.max_speed;
+    if (self.pressingUp)
+      self.speed_y = self.max_speed;
+    if (self.pressingDown)
+      self.speed_y = -self.max_speed;
+
+    if (!self.pressingLeft && !self.pressingRight) {
+      self.speed_x = 0;
+    }
+    if (!self.pressingUp && !self.pressingDown) {
+      self.speed_y = 0;
+    }
+
+    self.x += self.speed_x;
+    self.y += self.speed_y;
+
+		if (prev_x !== self.x || prev_y !== self.y)
+			ws.send(["move", {x: self.x, y: self.y}]);
+		prev_x = self.x;
+		prev_y = self.y;
+  }
+
 	return self;
 }
 
@@ -81,9 +113,31 @@ const wss = new ws.Server({ server });
 var websockets = {};
 
 wss.on("connection", function(ws) {
+	// TODO make id a string of chars and numbers
+	var id = Math.floor(Math.random() * Math.floor(100000)).toString();
+	var p = Player();
+	websockets[id] = p;
+	p.id = id;
+	ws.send(JSON.stringify(["init", {player: p}]))
+
 	ws.on("message", function(message) {
-		console.log("Type of message: " + JSON.parse(message)[0] + "\n" + "Message object: ", JSON.parse(message)[1]);
+		if (JSON.parse(message)[0] === "key_press") {
+			if (JSON.parse(message)[1].pressingUp !== undefined)
+				p.pressingUp = JSON.parse(message)[1].pressingUp;
+			if (JSON.parse(message)[1].pressingDown !== undefined)
+				p.pressingDown = JSON.parse(message)[1].pressingDown;
+			if (JSON.parse(message)[1].pressingLeft !== undefined)
+				p.pressingLeft = JSON.parse(message)[1].pressingLeft;
+			if (JSON.parse(message)[1].pressingRight !== undefined)
+				p.pressingRight = JSON.parse(message)[1].pressingRight;
+		}
 	});
-	msg = ["init", {id:"0123", name:"asd"}];
-	ws.send(JSON.stringify(msg));
+	setInterval(() => {
+		for (var id in websockets) {
+			if (websockets[id].pressingUp || websockets[id].pressingDown || websockets[id].pressingLeft || websockets[id].pressingRight) {
+				ws.send(JSON.stringify(["move", {player:websockets[id]}]));
+			}
+		}
+
+	}, 40);
 });

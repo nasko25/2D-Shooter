@@ -9,44 +9,56 @@ function draw(){
   WIDTH = document.getElementById("canv").width;
   HEIGHT = document.getElementById("canv").height;
   console.log(WIDTH+"; "+ HEIGHT);
-  socket.send(JSON.stringify(["screen_size", {WIDTH:WIDTH, HEIGHT:HEIGHT}]));
-  p.draw(canvas);
+  //socket.send(JSON.stringify(["screen_size", {WIDTH:WIDTH, HEIGHT:HEIGHT}]));
+  //p.draw(canvas);
 }
 
 var canvas = document.getElementById("canv").getContext("2d");
 window.addEventListener("load", draw);
 window.addEventListener("resize", draw);
+// TODO refactor
 window.addEventListener("keydown", (event) => {
+  // only register the the keydown once (when holding a key down)
+  if (event.repeat) { return; }
+
   if (event.keyCode === 65) {
     p.pressingLeft = true;
+    socket.send(JSON.stringify(["key_press", {pressingLeft: true}]));
   }
   else if (event.keyCode === 83) {
     p.pressingDown = true;
+    socket.send(JSON.stringify(["key_press", {pressingDown: true}]));
   }
   else if (event.keyCode === 68) {
     p.pressingRight = true;
+    socket.send(JSON.stringify(["key_press", {pressingRight: true}]));
   }
   else if (event.keyCode === 87) {
     p.pressingUp = true;
+    socket.send(JSON.stringify(["key_press", {pressingUp: true}]));
   }
 });
 window.addEventListener("keyup", (event) => {
   if (event.keyCode === 65) {
     p.pressingLeft = false;
+    socket.send(JSON.stringify(["key_press", {pressingLeft: false}]));
   }
   else if (event.keyCode === 83) {
     p.pressingDown = false;
+    socket.send(JSON.stringify(["key_press", {pressingDown: false}]));
   }
   else if (event.keyCode === 68) {
     p.pressingRight = false;
+    socket.send(JSON.stringify(["key_press", {pressingRight: false}]));
   }
   else if (event.keyCode === 87) {
     p.pressingUp = false;
+    socket.send(JSON.stringify(["key_press", {pressingUp: false}]));
   }
 });
 
 
-var Player = function() {
+var Player = function(id) {
   var self = {
     speed_x: 0,
     speed_y: 0,
@@ -60,10 +72,12 @@ var Player = function() {
     pressingDown: false,
     is_hit: false
   };
+  if (id)
+    self.id = id;
   self.image = new Image();
   self.image.src = "/img/player.png";
-  self.x = WIDTH/2 - self.image.width/2;
-  self.y = HEIGHT/2 - self.image.height/2;
+  self.x = 0;
+  self.y = 0;
   self.map = new Image();
   self.map.src = "/img/map.png"
 
@@ -72,6 +86,7 @@ var Player = function() {
     canvas.drawImage(self.image, WIDTH/2 - self.image.width/2, HEIGHT/2 - self.image.height/2);
   }
 
+  // TODO delete/refactor
   self.updatePosition = function() {
     // TODO rotate the image!
 
@@ -98,8 +113,8 @@ var Player = function() {
 
   return self;
 }
-var p = Player();
 
+var p;
 
 socket.onopen = function(data) {
   // ...
@@ -107,13 +122,34 @@ socket.onopen = function(data) {
 socket.onmessage = function(data) {
   //alert(JSON.parse(data.data)[0] + "; id = " + JSON.parse(data.data)[1].id + ", name = " + JSON.parse(data.data)[1].name);
   // if it is the first ever message from the server socket
+  console.log(JSON.parse(data.data)[1].player.id)
+  if (JSON.parse(data.data)[0] === "init") {
+    p = Player(JSON.parse(data.data)[1].player.id);
+    console.log(p)
+    p.draw(canvas);
+    p.draw(canvas);
+    p.draw(canvas);
+    p.draw(canvas);
+  }
+  if (JSON.parse(data.data)[0] === "move") {
+    if (JSON.parse(data.data)[1].player.id === p.id) {
+      p.pressingUp = JSON.parse(data.data)[1].player.pressingUp;
+      p.pressingDown = JSON.parse(data.data)[1].player.pressingDown;
+      p.pressingLeft = JSON.parse(data.data)[1].player.pressingLeft;
+      p.pressingRight = JSON.parse(data.data)[1].player.pressingRight;
+
+      canvas.clearRect(0, 0, WIDTH, HEIGHT);
+      p.updatePosition();
+      p.draw(canvas);
+    }
+  }
 }
 
-setInterval(() => {
-  canvas.clearRect(0, 0, WIDTH, HEIGHT);
-  p.updatePosition();
-  p.draw(canvas);
-}, 30);
+// setInterval(() => {
+//   // canvas.clearRect(0, 0, WIDTH, HEIGHT);
+//   // p.updatePosition();
+//   // p.draw(canvas);
+// }, 30);
 
 /* close the socket */
 // socket.close(1000, "Work complete");
