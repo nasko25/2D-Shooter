@@ -128,7 +128,7 @@ socket.onmessage = function(data) {
     setTimeout(()=>{
       canvas.clearRect(0, 0, WIDTH, HEIGHT);
       p.draw(canvas);
-    }, 40);
+    }, 80);
   }
   if (JSON.parse(data.data)[0] === "move") {
     if (JSON.parse(data.data)[1].player.id === p.id) {
@@ -144,11 +144,5 @@ socket.onmessage = function(data) {
   }
 }
 
-// setInterval(() => {
-//   // canvas.clearRect(0, 0, WIDTH, HEIGHT);
-//   // p.updatePosition();
-//   // p.draw(canvas);
-// }, 30);
-
-/* close the socket */
+/* close the socket ?*/
 // socket.close(1000, "Work complete");

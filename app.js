@@ -138,6 +138,11 @@ wss.on("connection", function(ws) {
 				ws.send(JSON.stringify(["move", {player:websockets[id]}]));
 			}
 		}
-
 	}, 40);
+
+	ws.on("close", () => {
+		console.log("connection closed");
+		delete websockets[id];
+		console.log("deleted the socket associated with id " + id);
+	});
 });
