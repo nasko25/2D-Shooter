@@ -138,7 +138,9 @@ socket.onmessage = function(data) {
       p.pressingRight = JSON.parse(data.data)[1].player.pressingRight;
 
       canvas.clearRect(0, 0, WIDTH, HEIGHT);
-      p.updatePosition();
+      //p.updatePosition();
+      p.x = JSON.parse(data.data)[1].player.x;
+      p.y = JSON.parse(data.data)[1].player.y;
       p.draw(canvas);
     }
   }

@@ -96,10 +96,10 @@ Player = function() {
     self.x += self.speed_x;
     self.y += self.speed_y;
 
-		if (prev_x !== self.x || prev_y !== self.y)
-			ws.send(["move", {x: self.x, y: self.y}]);
-		prev_x = self.x;
-		prev_y = self.y;
+		// if (prev_x !== self.x || prev_y !== self.y)
+		// 	ws.send(["move", {x: self.x, y: self.y}]);
+		// prev_x = self.x;
+		// prev_y = self.y;
   }
 
 	return self;
@@ -135,6 +135,7 @@ wss.on("connection", function(ws) {
 	setInterval(() => {
 		for (var id in websockets) {
 			if (websockets[id].pressingUp || websockets[id].pressingDown || websockets[id].pressingLeft || websockets[id].pressingRight) {
+        websockets[id].updatePosition();
 				ws.send(JSON.stringify(["move", {player:websockets[id]}]));
 			}
 		}
