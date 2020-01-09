@@ -119,15 +119,18 @@ Player = function() {
 // communication
 const wss = new ws.Server({ server });
 
-var websockets = {}; var interval;
-
+var players = {}; var interval;
+var websockets = {};
 wss.on("connection", function(ws) {
 	// TODO make id a string of chars and numbers
 	var id = Math.floor(Math.random() * Math.floor(100000)).toString();
 	var p = Player();
-	websockets[id] = p;
+	players[id] = p;
+	websockets[id] = ws;
 	p.id = id;
-	ws.send(JSON.stringify(["init", {player: p, other_players: websockets}]));
+	for (websock in websockets) {
+		websockets[websock].send(JSON.stringify(["init", {player: p, other_players: players}]));
+	}
 
 	ws.on("message", function(message) {
 		if (JSON.parse(message)[0] === "key_press") {
@@ -142,16 +145,23 @@ wss.on("connection", function(ws) {
 		}
 	});
 	interval = setInterval(() => {
-		for (var id in websockets) {
-			if (websockets[id].pressingUp || websockets[id].pressingDown || websockets[id].pressingLeft || websockets[id].pressingRight) {
-        websockets[id].updatePosition();
-				ws.send(JSON.stringify(["move", {player:websockets[id]}]));
+		// for (var id in players) {
+		// 	if (players[id].pressingUp || players[id].pressingDown || players[id].pressingLeft || players[id].pressingRight) {
+    //     players[id].updatePosition();
+		// 		ws.send(JSON.stringify(["move", {player:players[id]}]));
+		// 	}
+		// }
+		if (p.pressingUp || p.pressingDown || p.pressingLeft || p.pressingRight) {
+			p.updatePosition();
+			for (websock in websockets) {
+				websockets[websock].send(JSON.stringify(["move", {player:players[id]}]));
 			}
 		}
 	}, 40);
 
 	ws.on("close", () => {
 		console.log("connection closed");
+		delete players[id];
 		delete websockets[id];
 		console.log("deleted the socket associated with id " + id);
 		console.log("clearing the interval\n")

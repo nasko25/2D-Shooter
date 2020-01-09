@@ -127,7 +127,14 @@ var Enemy = function (player) {
   return self;
 }
 
-var p; var id;
+var drawPlayers = function(p, other_players) {
+  canvas.clearRect(0, 0, WIDTH, HEIGHT);
+  p.draw(canvas);
+  for (players_id in other_players)
+    other_players[players_id].draw(canvas);
+}
+
+var p; var id = "";
 
 socket.onopen = function(data) {
   // ...
@@ -135,24 +142,26 @@ socket.onopen = function(data) {
 socket.onmessage = function(data) {
   //alert(JSON.parse(data.data)[0] + "; id = " + JSON.parse(data.data)[1].id + ", name = " + JSON.parse(data.data)[1].name);
   // if it is the first ever message from the server socket
-  if (JSON.parse(data.data)[0] === "init") {
+  if (JSON.parse(data.data)[0] === "init" && id === "") {
     id = JSON.parse(data.data)[1].player.id;
     p = Player(id);
 
     players = JSON.parse(data.data)[1].other_players;
-    other_players = [];
+    other_players = {};
     for(players_id in players) {
       if (players_id !== id)
-      other_players.push(Enemy(players[players_id]));
+        other_players[players_id] = Enemy(players[players_id]);
     }
-    console.log(players)
+    // console.log(players)
     // give it time to fetch the images
     setTimeout(()=>{
-      canvas.clearRect(0, 0, WIDTH, HEIGHT);
-      p.draw(canvas);
-      for (id in players)
-        players[id].draw(canvas);
+      drawPlayers(p, other_players);
     }, 200);
+  }
+
+  else if (JSON.parse(data.data)[0] === "init") {
+    other_players[JSON.parse(data.data)[1].player.id] = Enemy(JSON.parse(data.data)[1].player);
+    drawPlayers(p, other_players);
   }
   if (JSON.parse(data.data)[0] === "move") {
     if (JSON.parse(data.data)[1].player.id === p.id) {
@@ -161,11 +170,15 @@ socket.onmessage = function(data) {
       p.pressingLeft = JSON.parse(data.data)[1].player.pressingLeft;
       p.pressingRight = JSON.parse(data.data)[1].player.pressingRight;
 
-      canvas.clearRect(0, 0, WIDTH, HEIGHT);
       //p.updatePosition();
       p.x = JSON.parse(data.data)[1].player.x;
       p.y = JSON.parse(data.data)[1].player.y;
-      p.draw(canvas);
+      drawPlayers(p, other_players);
+    }
+    else {
+      other_players[JSON.parse(data.data)[1].player.id].x = JSON.parse(data.data)[1].player.x;
+      other_players[JSON.parse(data.data)[1].player.id].y = JSON.parse(data.data)[1].player.y;
+      drawPlayers(p, other_players);
     }
   }
 }
