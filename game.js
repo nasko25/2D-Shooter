@@ -152,7 +152,7 @@ socket.onmessage = function(data) {
       p.draw(canvas);
       for (id in players)
         players[id].draw(canvas);
-    }, 80);
+    }, 200);
   }
   if (JSON.parse(data.data)[0] === "move") {
     if (JSON.parse(data.data)[1].player.id === p.id) {
