@@ -8,7 +8,8 @@ function draw(){
   document.getElementById("canv").height = window.innerHeight*0.75;
   WIDTH = document.getElementById("canv").width;
   HEIGHT = document.getElementById("canv").height;
-  console.log(WIDTH+"; "+ HEIGHT);
+  drawPlayers(p, other_players);
+  // console.log(WIDTH+"; "+ HEIGHT);
   //socket.send(JSON.stringify(["screen_size", {WIDTH:WIDTH, HEIGHT:HEIGHT}]));
   //p.draw(canvas);
 }
@@ -121,7 +122,7 @@ var Enemy = function (player) {
   self.image = new Image();
   self.image.src = "/img/player.png";
   self.draw = function(canvas) {
-    canvas.drawImage(self.image, self.x, self.y);
+    canvas.drawImage(self.image, p.x - self.x + WIDTH/2 - self.image.width/2, p.y - self.y + HEIGHT/2 - self.image.height/2);
   }
 
   return self;

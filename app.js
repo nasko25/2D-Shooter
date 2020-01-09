@@ -123,6 +123,7 @@ var players = {}; var interval;
 var websockets = {};
 wss.on("connection", function(ws) {
 	// TODO make id a string of chars and numbers
+	// TODO randomize starting positions 
 	var id = Math.floor(Math.random() * Math.floor(100000)).toString();
 	var p = Player();
 	players[id] = p;
@@ -154,7 +155,7 @@ wss.on("connection", function(ws) {
 		if (p.pressingUp || p.pressingDown || p.pressingLeft || p.pressingRight) {
 			p.updatePosition();
 			for (websock in websockets) {
-				websockets[websock].send(JSON.stringify(["move", {player:players[id]}]));
+				websockets[websock].send(JSON.stringify(["move", {player: p }]));
 			}
 		}
 	}, 40);
