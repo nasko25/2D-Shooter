@@ -82,8 +82,10 @@ var Player = function(id) {
   self.map.src = "/img/map.png"
 
   self.draw = function(canvas) {
-    canvas.drawImage(self.map, 0 + self.x, 0 + self.y);
-    canvas.drawImage(self.image, WIDTH/2 - self.image.width/2, HEIGHT/2 - self.image.height/2);
+    if (self.id === id) {
+      canvas.drawImage(self.map, 0 + self.x, 0 + self.y);
+      canvas.drawImage(self.image, WIDTH/2 - self.image.width/2, HEIGHT/2 - self.image.height/2);
+    }
   }
 
   // TODO delete/refactor
@@ -114,7 +116,18 @@ var Player = function(id) {
   return self;
 }
 
-var p;
+var Enemy = function (player) {
+  var self = player;
+  self.image = new Image();
+  self.image.src = "/img/player.png";
+  self.draw = function(canvas) {
+    canvas.drawImage(self.image, self.x, self.y);
+  }
+
+  return self;
+}
+
+var p; var id;
 
 socket.onopen = function(data) {
   // ...
@@ -123,11 +136,22 @@ socket.onmessage = function(data) {
   //alert(JSON.parse(data.data)[0] + "; id = " + JSON.parse(data.data)[1].id + ", name = " + JSON.parse(data.data)[1].name);
   // if it is the first ever message from the server socket
   if (JSON.parse(data.data)[0] === "init") {
-    p = Player(JSON.parse(data.data)[1].player.id);
+    id = JSON.parse(data.data)[1].player.id;
+    p = Player(id);
+
+    players = JSON.parse(data.data)[1].other_players;
+    other_players = [];
+    for(players_id in players) {
+      if (players_id !== id)
+      other_players.push(Enemy(players[players_id]));
+    }
+    console.log(players)
     // give it time to fetch the images
     setTimeout(()=>{
       canvas.clearRect(0, 0, WIDTH, HEIGHT);
       p.draw(canvas);
+      for (id in players)
+        players[id].draw(canvas);
     }, 80);
   }
   if (JSON.parse(data.data)[0] === "move") {

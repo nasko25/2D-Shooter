@@ -102,6 +102,10 @@ Player = function() {
 		// prev_y = self.y;
   }
 
+	self.draw = function(canvas) {
+		canvas.drawImage(self.image, self.x, self.y);
+	}
+
 	return self;
 }
 
@@ -109,7 +113,6 @@ Player = function() {
 // communication
 const wss = new ws.Server({ server });
 
-/* TODO clean unused websockets ! */
 var websockets = {};
 
 wss.on("connection", function(ws) {
@@ -118,7 +121,7 @@ wss.on("connection", function(ws) {
 	var p = Player();
 	websockets[id] = p;
 	p.id = id;
-	ws.send(JSON.stringify(["init", {player: p}]))
+	ws.send(JSON.stringify(["init", {player: p, other_players: websockets}]));
 
 	ws.on("message", function(message) {
 		if (JSON.parse(message)[0] === "key_press") {
