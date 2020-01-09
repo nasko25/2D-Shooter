@@ -119,7 +119,7 @@ Player = function() {
 // communication
 const wss = new ws.Server({ server });
 
-var websockets = {};
+var websockets = {}; var interval;
 
 wss.on("connection", function(ws) {
 	// TODO make id a string of chars and numbers
@@ -141,7 +141,7 @@ wss.on("connection", function(ws) {
 				p.pressingRight = JSON.parse(message)[1].pressingRight;
 		}
 	});
-	setInterval(() => {
+	interval = setInterval(() => {
 		for (var id in websockets) {
 			if (websockets[id].pressingUp || websockets[id].pressingDown || websockets[id].pressingLeft || websockets[id].pressingRight) {
         websockets[id].updatePosition();
@@ -154,5 +154,8 @@ wss.on("connection", function(ws) {
 		console.log("connection closed");
 		delete websockets[id];
 		console.log("deleted the socket associated with id " + id);
+		console.log("clearing the interval\n")
+		console.log("_________________________________\n")
+		clearInterval(interval);
 	});
 });
