@@ -93,8 +93,14 @@ Player = function() {
       self.speed_y = 0;
     }
 
-    self.x += self.speed_x;
-    self.y += self.speed_y;
+    if (Math.abs(self.speed_x) !== Math.abs(self.speed_y)) {
+        self.x += self.speed_x;
+        self.y += self.speed_y;
+    }
+    else {
+        self.x += self.speed_x*Math.sqrt(3)/2;
+        self.y += self.speed_y*Math.sqrt(3)/2;
+    }
 
 		// if (prev_x !== self.x || prev_y !== self.y)
 		// 	ws.send(["move", {x: self.x, y: self.y}]);
