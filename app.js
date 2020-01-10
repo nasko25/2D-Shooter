@@ -37,6 +37,7 @@ function Game(p1, p1_websocket, game_id) {
 	this.p2_websocket = undefined;
 	this.id = game_id;
 	this.waiting_for_players = true;
+	this.closed = 0;
 }
 
 // communication
@@ -53,7 +54,7 @@ wss.on("connection", function(ws) {
 	// first ever game on the server
 	if (Object.entries(games).length === 0 && games.constructor === Object) {
 		game_id = Math.floor(Math.random() * Math.floor(100000)).toString();
-		games[game_id] = new Game(p1, ws, id);
+		games[game_id] = new Game(p1, ws, game_id);
 	}
 	else {
 		for (var game in games) {
@@ -71,7 +72,7 @@ wss.on("connection", function(ws) {
 		// no game waits for players :(
 		if (game_id === undefined) {
 			game_id = Math.floor(Math.random() * Math.floor(100000)).toString();
-			games[game_id] = new Game(p1, ws, id);
+			games[game_id] = new Game(p1, ws, game_id);
 		}
 	}
 
@@ -110,7 +111,7 @@ wss.on("connection", function(ws) {
 			}
 		}
 	});
-	interval = setInterval(() => {
+	var interval = setInterval(function() {
 		// if (p.pressingUp || p.pressingDown || p.pressingLeft || p.pressingRight) {
 		// 	p.updatePosition();
 		// 	for (websock in websockets) {
@@ -133,13 +134,23 @@ wss.on("connection", function(ws) {
 			games[game_id].p2_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
 		}
 	}, 25);
-
 	ws.on("close", () => {
 		console.log("connection closed");
-		delete games[game_id];
-		console.log("deleted the game associated with id " + game_id);
+		games[game_id].p1_websocket.close();
+		games[game_id].p2_websocket.close();
+		games[game_id].closed++;
+		console.log("game set to be closed");
 		console.log("clearing the interval\n")
 		clearInterval(interval);
 		console.log("_________________________________\n")
 	});
 });
+
+setInterval(() => {
+	for (game in games) {
+		if (games[game].closed >= 2) {
+			delete games[game];
+			console.log("deleted the game associated with id " + game);
+		}
+	}
+}, 5000);

@@ -179,6 +179,10 @@ socket.onmessage = function(data) {
   render(ctx, 900, 600);
 }
 
+socket.onclose = function() {
+  console.log("closed")
+}
+
 // var speed = setInterval(() => {
 //   if (p1.ySpeed === 0) {
 //     p1.x = p1.x + p1.xSpeed * 2 / 6;
