@@ -84,8 +84,70 @@ var f2 = document.getElementById("flash2");
 var f3 = document.getElementById("flash3");
 var bullets = [];
 
+
+canvas.addEventListener('click', (ev) => {
+  if (p1.reload === 0) {
+    var c = new Bullet(p1.id);
+    var dx = ev.clientX + pageXOffset - 9 - point[0];
+    var dy = ev.clientY + pageYOffset - 9 - point[1];
+    var hyp = Math.sqrt(dx * dx + dy * dy);
+    c.generate(p1.x + 60, p1.y + 60, -dx * 20 / hyp, -dy * 20 / hyp, p1.rotation);
+    bullets.push(c);
+    p1.reload = 80;
+  }
+});
+
+window.addEventListener('mousemove', (ev) => {
+  if (p1) {
+    mouse[0] = ev.clientX + this.pageXOffset;
+    mouse[1] = ev.clientY + this.pageYOffset;
+    var dx = mouse[0] - point[0] - 9 - (window.innerWidth - canvas.width)/2,
+      dy = mouse[1] - point[1] - 9,
+      rot = Math.atan2(dy, dx);
+
+    p1.setrotation(rot);
+    render(ctx, 900, 600);
+  }
+});
+
+window.addEventListener('keypress', (e) => {
+
+  if (event.repeat) { return; }
+
+  if (e.code === 'KeyW') {
+    socket.send(JSON.stringify(["key_press", "up"]));
+  } else if (e.code === 'KeyD') {
+    //p1.setxSpeed(10);
+    socket.send(JSON.stringify(["key_press", "right"]));
+  } else if (e.code === 'KeyS') {
+    //p1.setySpeed(10);
+    socket.send(JSON.stringify(["key_press", "down"]));
+  } else if (e.code === 'KeyA') {
+    //p1.setxSpeed(-10);
+    socket.send(JSON.stringify(["key_press", "left"]));
+  }
+});
+
+window.addEventListener("keyup", (e) => {
+  if (e.code === 'KeyW') {
+    //p1.setySpeed(0);
+    socket.send(JSON.stringify(["key_up", "up"]));
+  } else if (e.code === 'KeyD') {
+    //p1.setxSpeed(0);
+    socket.send(JSON.stringify(["key_up", "right"]));
+  } else if (e.code === 'KeyS') {
+    //p1.setySpeed(0);
+    socket.send(JSON.stringify(["key_up", "down"]));
+  } else if (e.code === 'KeyA') {
+    //p1.setxSpeed(0);
+    socket.send(JSON.stringify(["key_up", "left"]));
+  }
+});
+
+
 socket.onmessage = function(data) {
   var message = JSON.parse(data.data);
+
   if (message[0] === "init") {
     p1 = new Player(message[1].player);
     enemy = new Enemy(message[1].enemy);
@@ -93,25 +155,28 @@ socket.onmessage = function(data) {
     document.getElementById("loaded").style.display = "block";
   }
 
-  else if (message[1] === "move") {
+  else if (message[0] === "move") {
     var x = message[1].x;
     var y = message[1].y;
 
     // player 1 moves
-    if (message[1].id === id) {
+    if (message[1].id === p1.id) {
       p1.x = x;
       p1.y = y;
+      p1.xSpeed = message[1].xSpeed;
+      p1.ySpeed = message[1].ySpeed;
     }
 
     else if (message[1].id === enemy.id){
       enemy.x = x;
       enemy.y = y;
+      enemy.xSpeed = message[1].xSpeed;
+      enemy.ySpeed = message[1].ySpeed;
     }
-    //p1.face();
   }
 
+  p1.face();
   render(ctx, 900, 600);
-
 }
 
 // var speed = setInterval(() => {
@@ -181,53 +246,3 @@ function render(ctx, width, height) {
   ctx.restore();
   p1.reload = Math.max(p1.reload - 1, 0);
 }
-
-
-canvas.addEventListener('click', (ev) => {
-  if (p1.reload === 0) {
-    var c = new Bullet(p1.id);
-    var dx = ev.clientX + pageXOffset - 9 - point[0];
-    var dy = ev.clientY + pageYOffset - 9 - point[1];
-    var hyp = Math.sqrt(dx * dx + dy * dy);
-    c.generate(p1.x + 60, p1.y + 60, -dx * 20 / hyp, -dy * 20 / hyp, p1.rotation);
-    bullets.push(c);
-    p1.reload = 80;
-  }
-});
-
-window.addEventListener('mousemove', (ev) => {
-  if (p1) {
-    mouse[0] = ev.clientX + this.pageXOffset;
-    mouse[1] = ev.clientY + this.pageYOffset;
-    var dx = mouse[0] - point[0] - 9 - (window.innerWidth - canvas.width)/2,
-      dy = mouse[1] - point[1] - 9,
-      rot = Math.atan2(dy, dx);
-
-    p1.setrotation(rot);
-    render(ctx, 900, 600);
-  }
-});
-
-window.addEventListener('keypress', (e) => {
-  if (e.code === 'KeyW') {
-    p1.setySpeed(-10);
-  } else if (e.code === 'KeyD') {
-    p1.setxSpeed(10);
-  } else if (e.code === 'KeyS') {
-    p1.setySpeed(10);
-  } else if (e.code === 'KeyA') {
-    p1.setxSpeed(-10);
-  }
-});
-
-window.addEventListener("keyup", (e) => {
-  if (e.code === 'KeyW') {
-    p1.setySpeed(0);
-  } else if (e.code === 'KeyD') {
-    p1.setxSpeed(0);
-  } else if (e.code === 'KeyS') {
-    p1.setySpeed(0);
-  } else if (e.code === 'KeyA') {
-    p1.setxSpeed(0);
-  }
-});

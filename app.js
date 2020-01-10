@@ -26,6 +26,7 @@ function Player(id) {
   this.reload = 0;
   this.xSpeed = 0;
   this.ySpeed = 0;
+	this.maxSpeed = 10;
   this.facing = 0;
 };
 
@@ -64,6 +65,7 @@ wss.on("connection", function(ws) {
 				game_id = game;
 				games[game_id].p1_websocket.send(JSON.stringify(["init", {player: games[game_id].p1, enemy: games[game_id].p2}]));
 				games[game_id].p2_websocket.send(JSON.stringify(["init", {player: games[game_id].p2, enemy: games[game_id].p1}]));
+				break;
 			}
 		}
 		// no game waits for players :(
@@ -73,18 +75,41 @@ wss.on("connection", function(ws) {
 		}
 	}
 
-	// ws.on("message", function(message) {
-	// 	if (JSON.parse(message)[0] === "key_press") {
-	// 		if (JSON.parse(message)[1].pressingUp !== undefined)
-	// 			p.pressingUp = JSON.parse(message)[1].pressingUp;
-	// 		if (JSON.parse(message)[1].pressingDown !== undefined)
-	// 			p.pressingDown = JSON.parse(message)[1].pressingDown;
-	// 		if (JSON.parse(message)[1].pressingLeft !== undefined)
-	// 			p.pressingLeft = JSON.parse(message)[1].pressingLeft;
-	// 		if (JSON.parse(message)[1].pressingRight !== undefined)
-	// 			p.pressingRight = JSON.parse(message)[1].pressingRight;
-	// 	}
-	// });
+	ws.on("message", function(message) {
+		if (JSON.parse(message)[0] === "key_press") {
+			if (JSON.parse(message)[1] === "up")
+				p1.ySpeed = -p1.maxSpeed;
+			if (JSON.parse(message)[1] === "down")
+				p1.ySpeed = p1.maxSpeed;
+			if (JSON.parse(message)[1] === "left")
+				p1.xSpeed = -p1.maxSpeed;
+			if (JSON.parse(message)[1] === "right")
+				p1.xSpeed = p1.maxSpeed;
+		}
+		else if (JSON.parse(message)[0] === "key_up") {
+			if (JSON.parse(message)[1] === "up") {
+				p1.ySpeed = 0;
+				// so that the client will know to stop displaying the tracks
+				games[game_id].p1_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+				games[game_id].p2_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+			}
+			if (JSON.parse(message)[1] === "down") {
+				p1.ySpeed = 0;
+				games[game_id].p1_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+				games[game_id].p2_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+			}
+			if (JSON.parse(message)[1] === "left") {
+				p1.xSpeed = 0;
+				games[game_id].p1_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+				games[game_id].p2_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+			}
+			if (JSON.parse(message)[1] === "right") {
+				p1.xSpeed = 0;
+				games[game_id].p1_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+				games[game_id].p2_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+			}
+		}
+	});
 	interval = setInterval(() => {
 		// if (p.pressingUp || p.pressingDown || p.pressingLeft || p.pressingRight) {
 		// 	p.updatePosition();
@@ -92,6 +117,21 @@ wss.on("connection", function(ws) {
 		// 		websockets[websock].send(JSON.stringify(["move", {player: p }]));
 		// 	}
 		// }
+		if (p1.ySpeed === 0) {
+	    p1.x = p1.x + p1.xSpeed * 2 / 6;
+	  } else {
+	    p1.x = p1.x + p1.xSpeed * Math.sqrt(50) / 30;
+	  }
+	  if (p1.xSpeed === 0) {
+	    p1.y = p1.y + p1.ySpeed * 2 / 6;
+	  } else {
+	    p1.y = p1.y + p1.ySpeed * Math.sqrt(50) / 30;
+	  }
+
+		if ((p1.ySpeed !== 0 || p1.xSpeed !== 0)) {
+			games[game_id].p1_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+			games[game_id].p2_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
+		}
 	}, 25);
 
 	ws.on("close", () => {
