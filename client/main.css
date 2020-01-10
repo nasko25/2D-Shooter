@@ -76,3 +76,7 @@ html {
   display: block;
   background: white;
 }
+
+#loaded {
+  display: none;
+}

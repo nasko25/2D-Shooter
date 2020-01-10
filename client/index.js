@@ -1,19 +1,11 @@
-//var socket = new WebSocket("ws://localhost:8080/index.js");
+var socket = new WebSocket("ws://localhost:8080/index.js");
 
 //Player object
-function Player(id) {
-  this.id = id;
-  this.rotation = Math.atan2(1, 1);
-  this.x = 10;
-  this.y = 10;
-  this.hit = false;
-  this.reload = 0;
-  this.xSpeed = 0;
-  this.ySpeed = 0;
-  this.facing = 0;
-  this.rotate = function(dy, dx) {
-    this.rotation = Math.atan2(dy, dx);
-  };
+function Player(init) {
+  for (var attr in init) {
+    this[attr] = init[attr];
+  }
+
   this.face = function() {
     if (this.ySpeed > 0 && this.xSpeed > 0) {
       this.facing = Math.PI * 1 / 4;
@@ -47,6 +39,12 @@ function Player(id) {
 
 };
 
+function Enemy(init) {
+  for (var attr in init) {
+    this[attr] = init[attr];
+  }
+}
+
 //Button object
 function Bullet(whoShot) {
   this.x = 0;
@@ -66,6 +64,7 @@ function Bullet(whoShot) {
 
   }
 };
+
 var canvas = document.getElementById("game");
 canvas.onselectstart = function() {
   return false;
@@ -75,7 +74,7 @@ var ctx2 = canvas.getContext("2d");
 var gun = document.getElementById("gun");
 var hull = document.getElementById("hull");
 var backgroundView = document.getElementById("inback");
-var p1 = new Player(0);
+var p1, enemy;
 var mouse = [0, 0];
 var point = [canvas.width / 2, canvas.height / 2];
 var tracksImg = document.getElementById("tracks");
@@ -84,25 +83,55 @@ var f1 = document.getElementById("flash1");
 var f2 = document.getElementById("flash2");
 var f3 = document.getElementById("flash3");
 var bullets = [];
-var speed = setInterval(() => {
-  if (p1.ySpeed === 0) {
-    p1.x = p1.x + p1.xSpeed * 2 / 6;
-  } else {
-    p1.x = p1.x + p1.xSpeed * Math.sqrt(50) / 30;
-  }
-  if (p1.xSpeed === 0) {
-    p1.y = p1.y + p1.ySpeed * 2 / 6;
-  } else {
-    p1.y = p1.y + p1.ySpeed * Math.sqrt(50) / 30;
+
+socket.onmessage = function(data) {
+  var message = JSON.parse(data.data);
+  if (message[0] === "init") {
+    p1 = new Player(message[1].player);
+    enemy = new Enemy(message[1].enemy);
+    document.getElementById("waiting").style.display = "none";
+    document.getElementById("loaded").style.display = "block";
   }
 
-  p1.face();
+  else if (message[1] === "move") {
+    var x = message[1].x;
+    var y = message[1].y;
+
+    // player 1 moves
+    if (message[1].id === id) {
+      p1.x = x;
+      p1.y = y;
+    }
+
+    else if (message[1].id === enemy.id){
+      enemy.x = x;
+      enemy.y = y;
+    }
+    //p1.face();
+  }
+
   render(ctx, 900, 600);
-}, 25);
+
+}
+
+// var speed = setInterval(() => {
+//   if (p1.ySpeed === 0) {
+//     p1.x = p1.x + p1.xSpeed * 2 / 6;
+//   } else {
+//     p1.x = p1.x + p1.xSpeed * Math.sqrt(50) / 30;
+//   }
+//   if (p1.xSpeed === 0) {
+//     p1.y = p1.y + p1.ySpeed * 2 / 6;
+//   } else {
+//     p1.y = p1.y + p1.ySpeed * Math.sqrt(50) / 30;
+//   }
+//
+//   p1.face();
+//   render(ctx, 900, 600);
+// }, 25);
 
 function render(ctx, width, height) {
   ctx.clearRect(0, 0, width, height)
-
   let x = canvas.width / 2,
     y = canvas.height / 2;
   ctx.drawImage(backgroundView, -p1.x, -p1.y);
@@ -167,13 +196,16 @@ canvas.addEventListener('click', (ev) => {
 });
 
 window.addEventListener('mousemove', (ev) => {
-  mouse[0] = ev.clientX + this.pageXOffset;
-  mouse[1] = ev.clientY + this.pageYOffset;
-  var dx = mouse[0] - point[0] - 9 - (window.innerWidth - canvas.width)/2,
-    dy = mouse[1] - point[1] - 9,
-    rot = Math.atan2(dy, dx);
+  if (p1) {
+    mouse[0] = ev.clientX + this.pageXOffset;
+    mouse[1] = ev.clientY + this.pageYOffset;
+    var dx = mouse[0] - point[0] - 9 - (window.innerWidth - canvas.width)/2,
+      dy = mouse[1] - point[1] - 9,
+      rot = Math.atan2(dy, dx);
 
-  p1.setrotation(rot);
+    p1.setrotation(rot);
+    render(ctx, 900, 600);
+  }
 });
 
 window.addEventListener('keypress', (e) => {
