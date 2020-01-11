@@ -105,10 +105,12 @@ function Bullet(whoShot) {
 };
 
 canvas.addEventListener('click', (ev) => {
-  var dx = ev.clientX + pageXOffset - 9 - point[0];
-  var dy = ev.clientY + pageYOffset - 9 - point[1];
-  var hyp = Math.sqrt(dx * dx + dy * dy);
-  socket.send(JSON.stringify(["shoot", {id: p1.id, dx: dx, dy: dy}]))
+  if (p1.reload === 0) {
+    var dx = ev.clientX + pageXOffset - 9 - point[0];
+    var dy = ev.clientY + pageYOffset - 9 - point[1];
+    var hyp = Math.sqrt(dx * dx + dy * dy);
+    socket.send(JSON.stringify(["shoot", {id: p1.id, dx: dx, dy: dy}]));
+  }
   // if (p1.reload === 0) {
   //   var c = new Bullet(p1.id);
   //
@@ -211,9 +213,12 @@ socket.onmessage = function(data) {
   }
 
   else if (message[0] === "shoot") {
+    bullets.push({rotation: message[1].rotation, y: message[1].y, id: message[1].id});
     if (message[1].id === p1.id) {
-      bullets.push({rotation: message[1].rotation, y: message[1].y});
       p1.reload = message[1].reload;
+    }
+    else if (message[1].id === enemy.id) {
+      enemy.reload = message[1].reload;
     }
   }
 
@@ -304,8 +309,28 @@ function render(ctx, width, height) {
   //
   for (; index < bullets.length; ++index) {
     ctx.save();
-    ctx.rotate(bullets[index].rotation + 90 * Math.PI / 180);
-    ctx.drawImage(shell, -35, p1.y - bullets[index].y, shell.width * 2 / 3, shell.height * 2 / 3);
+    if (bullets[index].id === p1.id) {
+      ctx.rotate(bullets[index].rotation + 90 * Math.PI / 180);
+      ctx.drawImage(shell, -35, p1.y - bullets[index].y, shell.width * 2 / 3, shell.height * 2 / 3);
+    }
+    else if (bullets[index].id === enemy.id) {
+      ctx.translate(enemy.x - p1.x, enemy.y-p1.y);
+
+      ctx.rotate(bullets[index].rotation + 90 * Math.PI / 180);
+      ctx.drawImage(shell, -35, enemy.y - bullets[index].y, shell.width * 2 / 3, shell.height * 2 / 3);
+
+      if (enemy.reload <= 80 && enemy.reload > 78) {
+        ctx.drawImage(flash1, -60, -200);
+      } else if (enemy.reload <= 78 && enemy.reload > 74) {
+        ctx.drawImage(flash2, -60, -200);
+      } else if (enemy.reload <= 74 && enemy.reload > 70) {
+        ctx.drawImage(flash3, -60, -200);
+      }
+    }
+    else {
+      ctx.restore();
+      break;
+    }
     ctx.restore();
     bullets.splice(index, 1);
   }
@@ -326,5 +351,5 @@ function render(ctx, width, height) {
   ctx.drawImage(gun, -20, -73, gun.width * 2 / 3, gun.height * 2 / 3);
 
   ctx.restore();
-  p1.reload = Math.max(p1.reload - 1, 0);
+  //p1.reload = Math.max(p1.reload - 1, 0);
 }
