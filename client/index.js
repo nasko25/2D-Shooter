@@ -43,6 +43,26 @@ function Enemy(init) {
   for (var attr in init) {
     this[attr] = init[attr];
   }
+
+  this.face = function() {
+    if (this.ySpeed > 0 && this.xSpeed > 0) {
+      this.facing = Math.PI * 1 / 4;
+    } else if (this.ySpeed > 0 && this.xSpeed < 0) {
+      this.facing = Math.PI * 3 / 4;
+    } else if (this.ySpeed > 0) {
+      this.facing = Math.PI / 2;
+    } else if (this.xSpeed > 0 && this.ySpeed === 0) {
+      this.facing = 0;
+    } else if (this.ySpeed < 0 && this.xSpeed > 0) {
+      this.facing = -Math.PI * 1 / 4;
+    } else if (this.ySpeed < 0 && this.xSpeed < 0) {
+      this.facing = -Math.PI * 3 / 4;
+    } else if (this.ySpeed < 0) {
+      this.facing = -Math.PI * 1 / 2;
+    } else if (this.xSpeed < 0) {
+      this.facing = -Math.PI;
+    }
+  }
 }
 
 //Button object
@@ -176,6 +196,7 @@ socket.onmessage = function(data) {
   }
 
   p1.face();
+  enemy.face();
   render(ctx, 900, 600);
 }
 
@@ -218,6 +239,12 @@ function render(ctx, width, height) {
   }
   ctx.drawImage(hull, -85, -97, hull.width * 2 / 3, hull.height * 2 / 3);
 
+  ctx.restore();
+
+  ctx.save()
+  ctx.translate(enemy.x - p1.x + width/2 + 150, enemy.y-p1.y + height/2 + 100);
+  ctx.rotate(enemy.facing + 90 * Math.PI / 180);
+  ctx.drawImage(hull, -85, -97, hull.width * 2 / 3, hull.height * 2 / 3)
   ctx.restore();
 
   ctx.save();

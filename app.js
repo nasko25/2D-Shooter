@@ -137,7 +137,8 @@ wss.on("connection", function(ws) {
 	ws.on("close", () => {
 		console.log("connection closed");
 		games[game_id].p1_websocket.close();
-		games[game_id].p2_websocket.close();
+		if (games[game_id].p2_websocket)
+			games[game_id].p2_websocket.close();
 		games[game_id].closed++;
 		console.log("game set to be closed");
 		console.log("clearing the interval\n")
