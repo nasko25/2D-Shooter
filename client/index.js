@@ -125,8 +125,9 @@ window.addEventListener('mousemove', (ev) => {
       dy = mouse[1] - point[1] - 9,
       rot = Math.atan2(dy, dx);
 
-    p1.setrotation(rot);
-    render(ctx, 900, 600);
+    // p1.setrotation(rot);
+    // render(ctx, 900, 600);
+    socket.send(JSON.stringify(["mouse_move", {rotation:rot}]));
   }
 });
 
@@ -185,6 +186,8 @@ socket.onmessage = function(data) {
       p1.y = y;
       p1.xSpeed = message[1].xSpeed;
       p1.ySpeed = message[1].ySpeed;
+
+      p1.face();
     }
 
     else if (message[1].id === enemy.id){
@@ -192,11 +195,20 @@ socket.onmessage = function(data) {
       enemy.y = y;
       enemy.xSpeed = message[1].xSpeed;
       enemy.ySpeed = message[1].ySpeed;
+
+      enemy.face();
     }
   }
 
-  p1.face();
-  enemy.face();
+  else if (message[0] === "mouse_move") {
+    if (message[1].id === p1.id) {
+      p1.rotation = message[1].rotation;
+    }
+    else if (message[1].id === enemy.id) {
+      enemy.rotation = message[1].rotation;
+    }
+  }
+
   render(ctx, 900, 600);
 }
 
@@ -241,14 +253,26 @@ function render(ctx, width, height) {
 
   ctx.restore();
 
-  ctx.save()
+  ctx.save();
   ctx.translate(enemy.x - p1.x + width/2 + 150, enemy.y-p1.y + height/2 + 100);
   ctx.rotate(enemy.facing + 90 * Math.PI / 180);
-  ctx.drawImage(hull, -85, -97, hull.width * 2 / 3, hull.height * 2 / 3)
+  if (enemy.xSpeed !== 0 || enemy.ySpeed !== 0) {
+
+    ctx.drawImage(tracksImg, -65, 20, tracksImg.width * 2 / 3, tracksImg.height * 2 / 3);
+    ctx.drawImage(tracksImg, -15, 20, tracksImg.width * 2 / 3, tracksImg.height * 2 / 3);
+  }
+  ctx.drawImage(hull, -85, -97, hull.width * 2 / 3, hull.height * 2 / 3);
   ctx.restore();
 
-  ctx.save();
 
+  ctx.save();
+  ctx.translate(enemy.x - p1.x + width/2 + 150, enemy.y-p1.y + height/2 + 100);
+  ctx.rotate(enemy.rotation + 90 * Math.PI / 180);
+  ctx.drawImage(gun, -20, -73, gun.width * 2 / 3, gun.height * 2 / 3);
+  ctx.restore();
+
+
+  ctx.save();
   ctx.translate(x, y);
   for (; index < bullets.length; ++index) {
     ctx.save();

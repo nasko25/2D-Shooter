@@ -77,7 +77,12 @@ wss.on("connection", function(ws) {
 	}
 
 	ws.on("message", function(message) {
-		if (JSON.parse(message)[0] === "key_press") {
+		if (JSON.parse(message)[0] === "mouse_move") {
+			p1.rotation = JSON.parse(message)[1].rotation;
+			games[game_id].p1_websocket.send(JSON.stringify(["mouse_move", {id: p1.id, rotation: p1.rotation}]));
+			games[game_id].p2_websocket.send(JSON.stringify(["mouse_move", {id: p1.id, rotation: p1.rotation}]));
+		}
+		else if (JSON.parse(message)[0] === "key_press") {
 			if (JSON.parse(message)[1] === "up")
 				p1.ySpeed = -p1.maxSpeed;
 			if (JSON.parse(message)[1] === "down")
