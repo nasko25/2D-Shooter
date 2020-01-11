@@ -30,6 +30,24 @@ function Player(id) {
   this.facing = 0;
 };
 
+// Bullet
+function Bullet(whoShot) {
+  this.x = 0;
+  this.y = 0;
+  this.rotation = 0;
+  this.speedX = 0;
+  this.speedY = 0;
+  this.playerId = whoShot;
+  this.generate = function(playerX, playerY, velocityX, velocityY, rotation) {
+    this.x = playerX;
+    this.y = playerY + 50;
+    this.rotation = rotation;
+  }
+  this.move = function() {
+    this.y = this.y + 20;
+  }
+};
+
 function Game(p1, p1_websocket, game_id) {
 	this.p1 = p1;
 	this.p1_websocket = p1_websocket;
@@ -38,6 +56,7 @@ function Game(p1, p1_websocket, game_id) {
 	this.id = game_id;
 	this.waiting_for_players = true;
 	this.closed = 0;
+	this.bullets = [];
 }
 
 // communication
@@ -115,6 +134,18 @@ wss.on("connection", function(ws) {
 				games[game_id].p2_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
 			}
 		}
+		else if (JSON.parse(message)[0] === "shoot") {
+			if (p1.reload === 0) {
+				var dx = JSON.parse(message)[1].dx;
+				var dy = JSON.parse(message)[1].dy;
+				var hyp = JSON.parse(message)[1].hyp;
+
+		    var bullet = new Bullet(p1.id);
+		    bullet.generate(p1.x + 60, p1.y + 60, -dx * 20 / hyp, -dy * 20 / hyp, p1.rotation);
+		    games[game_id].bullets.push(bullet);
+		    p1.reload = 80;
+		  }
+		}
 	});
 	var interval = setInterval(function() {
 		// if (p.pressingUp || p.pressingDown || p.pressingLeft || p.pressingRight) {
@@ -138,6 +169,16 @@ wss.on("connection", function(ws) {
 			games[game_id].p1_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
 			games[game_id].p2_websocket.send(JSON.stringify(["move", {x:p1.x, y: p1.y, id: p1.id, xSpeed: p1.xSpeed, ySpeed: p1.ySpeed}]));
 		}
+
+		games[game_id].bullets.forEach(function(element, index, object) {
+			element.move();
+			games[game_id].p1_websocket.send(JSON.stringify(["shoot", {id: element.playerId, x:element.x, y: element.y, reload: p1.reload, rotation: element.rotation}]));
+			games[game_id].p2_websocket.send(JSON.stringify(["shoot", {id: element.playerId, x:element.x, y: element.y, reload: p1.reload, rotation: element.rotation}]));
+		  if (element.y < -500 || element.y > 5000) {
+		    object.splice(index, 1);
+		  }
+			p1.reload = Math.max(p1.reload - 1, 0);
+		});
 	}, 25);
 	ws.on("close", () => {
 		console.log("connection closed");

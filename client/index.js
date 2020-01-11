@@ -1,5 +1,24 @@
 var socket = new WebSocket("ws://localhost:8080/index.js");
 
+var canvas = document.getElementById("game");
+canvas.onselectstart = function() {
+  return false;
+}
+var ctx = canvas.getContext("2d");
+var ctx2 = canvas.getContext("2d");
+var gun = document.getElementById("gun");
+var hull = document.getElementById("hull");
+var backgroundView = document.getElementById("inback");
+var p1, enemy;
+var mouse = [0, 0];
+var point = [canvas.width / 2, canvas.height / 2];
+var tracksImg = document.getElementById("tracks");
+var shell = document.getElementById("shell");
+var f1 = document.getElementById("flash1");
+var f2 = document.getElementById("flash2");
+var f3 = document.getElementById("flash3");
+var bullets = [];
+
 //Player object
 function Player(init) {
   for (var attr in init) {
@@ -65,7 +84,7 @@ function Enemy(init) {
   }
 }
 
-//Button object
+// Bullet object
 function Bullet(whoShot) {
   this.x = 0;
   this.y = 0;
@@ -73,48 +92,30 @@ function Bullet(whoShot) {
   this.speedX = 0;
   this.speedY = 0;
   this.playerId = whoShot;
-  this.generate = function(playerX, playerY, velocityX, velocityY, rotation) {
-
-    this.x = playerX;
-    this.y = playerY + 50;
-    this.rotation = rotation;
-  }
-  this.move = function() {
-    this.y = this.y + 20;
-
-  }
+  // this.generate = function(playerX, playerY, velocityX, velocityY, rotation) {
+  //
+  //   this.x = playerX;
+  //   this.y = playerY + 50;
+  //   this.rotation = rotation;
+  // }
+  // this.move = function() {
+  //   this.y = this.y + 20;
+  //
+  // }
 };
 
-var canvas = document.getElementById("game");
-canvas.onselectstart = function() {
-  return false;
-}
-var ctx = canvas.getContext("2d");
-var ctx2 = canvas.getContext("2d");
-var gun = document.getElementById("gun");
-var hull = document.getElementById("hull");
-var backgroundView = document.getElementById("inback");
-var p1, enemy;
-var mouse = [0, 0];
-var point = [canvas.width / 2, canvas.height / 2];
-var tracksImg = document.getElementById("tracks");
-var shell = document.getElementById("shell");
-var f1 = document.getElementById("flash1");
-var f2 = document.getElementById("flash2");
-var f3 = document.getElementById("flash3");
-var bullets = [];
-
-
 canvas.addEventListener('click', (ev) => {
-  if (p1.reload === 0) {
-    var c = new Bullet(p1.id);
-    var dx = ev.clientX + pageXOffset - 9 - point[0];
-    var dy = ev.clientY + pageYOffset - 9 - point[1];
-    var hyp = Math.sqrt(dx * dx + dy * dy);
-    c.generate(p1.x + 60, p1.y + 60, -dx * 20 / hyp, -dy * 20 / hyp, p1.rotation);
-    bullets.push(c);
-    p1.reload = 80;
-  }
+  var dx = ev.clientX + pageXOffset - 9 - point[0];
+  var dy = ev.clientY + pageYOffset - 9 - point[1];
+  var hyp = Math.sqrt(dx * dx + dy * dy);
+  socket.send(JSON.stringify(["shoot", {id: p1.id, dx: dx, dy: dy}]))
+  // if (p1.reload === 0) {
+  //   var c = new Bullet(p1.id);
+  //
+  //   c.generate(p1.x + 60, p1.y + 60, -dx * 20 / hyp, -dy * 20 / hyp, p1.rotation);
+  //   bullets.push(c);
+  //   p1.reload = 80;
+  // }
 });
 
 window.addEventListener('mousemove', (ev) => {
@@ -209,11 +210,18 @@ socket.onmessage = function(data) {
     }
   }
 
+  else if (message[0] === "shoot") {
+    if (message[1].id === p1.id) {
+      bullets.push({rotation: message[1].rotation, y: message[1].y});
+      p1.reload = message[1].reload;
+    }
+  }
+
   render(ctx, 900, 600);
 }
 
 socket.onclose = function() {
-  console.log("closed")
+  console.log("closed");
 }
 
 // var speed = setInterval(() => {
@@ -232,13 +240,19 @@ socket.onclose = function() {
 //   render(ctx, 900, 600);
 // }, 25);
 
+
+// TODO function too big; extract smaller functions and call only them, not calling render() each time
 function render(ctx, width, height) {
-  ctx.clearRect(0, 0, width, height)
+  ctx.clearRect(0, 0, width, height);
+
+  // draw the background
+
   let x = canvas.width / 2,
     y = canvas.height / 2;
   ctx.drawImage(backgroundView, -p1.x, -p1.y);
-  ctx.save();
 
+  // draw the player
+  ctx.save();
   ctx.translate(x, y);
   var index = 0;
 
@@ -253,6 +267,7 @@ function render(ctx, width, height) {
 
   ctx.restore();
 
+  // draw the enemy
   ctx.save();
   ctx.translate(enemy.x - p1.x + width/2 + 150, enemy.y-p1.y + height/2 + 100);
   ctx.rotate(enemy.facing + 90 * Math.PI / 180);
@@ -264,30 +279,41 @@ function render(ctx, width, height) {
   ctx.drawImage(hull, -85, -97, hull.width * 2 / 3, hull.height * 2 / 3);
   ctx.restore();
 
-
+  // draw the enemy's gun
   ctx.save();
   ctx.translate(enemy.x - p1.x + width/2 + 150, enemy.y-p1.y + height/2 + 100);
   ctx.rotate(enemy.rotation + 90 * Math.PI / 180);
   ctx.drawImage(gun, -20, -73, gun.width * 2 / 3, gun.height * 2 / 3);
   ctx.restore();
 
-
+  // draw the bullets
   ctx.save();
   ctx.translate(x, y);
+  // for (; index < bullets.length; ++index) {
+  //   ctx.save();
+  //   ctx.rotate(bullets[index].rotation + 90 * Math.PI / 180);
+  //   ctx.drawImage(shell, -35, p1.y - bullets[index].y, shell.width * 2 / 3, shell.height * 2 / 3);
+  //   bullets[index].move();
+  //   if (bullets[index].y < -500 || bullets[index].y > 5000) {
+  //     console.log(index + " " + bullets.length);
+  //     bullets.splice(index, 1);
+  //     index--;
+  //   }
+  //   ctx.restore();
+  // }
+  //
   for (; index < bullets.length; ++index) {
     ctx.save();
     ctx.rotate(bullets[index].rotation + 90 * Math.PI / 180);
     ctx.drawImage(shell, -35, p1.y - bullets[index].y, shell.width * 2 / 3, shell.height * 2 / 3);
-    bullets[index].move();
-    if (bullets[index].y < -500 || bullets[index].y > 5000) {
-      console.log(index + " " + bullets.length);
-      bullets.splice(index, 1);
-      index--;
-    }
     ctx.restore();
+    bullets.splice(index, 1);
   }
+
+  // rotate the gun
   ctx.rotate(p1.rotation + 90 * Math.PI / 180);
 
+  // draw the shooting animation
   if (p1.reload <= 80 && p1.reload > 78) {
     ctx.drawImage(flash1, -60, -200);
   } else if (p1.reload <= 78 && p1.reload > 74) {
@@ -296,6 +322,7 @@ function render(ctx, width, height) {
     ctx.drawImage(flash3, -60, -200);
   }
 
+  // draw the player's gun
   ctx.drawImage(gun, -20, -73, gun.width * 2 / 3, gun.height * 2 / 3);
 
   ctx.restore();
