@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://localhost:8080/index.js");
+var socket = new WebSocket("ws://localhost:8080/game.js");
 
 var canvas = document.getElementById("game");
 canvas.onselectstart = function() {
@@ -191,7 +191,7 @@ socket.onmessage = function(data) {
   if (message[0] === "init") {
     p1 = new Player(message[1].player);
     clientObject=new clientView(p1.id);
-    
+
     enemy = new Enemy(message[1].enemy);
     document.getElementById("waiting").style.display = "none";
     document.getElementById("loaded").style.display = "block";
@@ -240,7 +240,7 @@ socket.onmessage = function(data) {
     }
   }
 
-  
+
 }
 
 socket.onclose = function() {
@@ -270,7 +270,7 @@ var updated = false;
    if(Math.abs(clientObject.y-p1.y)>3){
     clientObject.y=p1.y;
     console.log(" updateD: "+clientObject.y+" a "+clientObject.speedY);
-   
+
   }
   if(clientObject.speedX!==p1.xSpeed){
     clientObject.speedX=p1.xSpeed;
@@ -280,7 +280,7 @@ var updated = false;
   }
   updated=false;
    }
-  
+
   render(ctx, 900, 600);
  }, 25);
 
