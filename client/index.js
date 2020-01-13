@@ -10,6 +10,7 @@ var gun = document.getElementById("gun");
 var hull = document.getElementById("hull");
 var backgroundView = document.getElementById("inback");
 var p1, enemy;
+var clientObject;
 var mouse = [0, 0];
 var point = [canvas.width / 2, canvas.height / 2];
 var tracksImg = document.getElementById("tracks");
@@ -57,7 +58,7 @@ function Player(init) {
   };
 
 };
-
+//Enemy object
 function Enemy(init) {
   for (var attr in init) {
     this[attr] = init[attr];
@@ -84,6 +85,15 @@ function Enemy(init) {
   }
 }
 
+//client
+function clientView(id) {
+  this.id=0;
+  this.x=0;
+  this.y=0;
+  this.speedY=0;
+  this.speedX=0;
+  this.rotate=0;
+}
 // Bullet object
 function Bullet(whoShot) {
   this.x = 0;
@@ -127,53 +137,61 @@ window.addEventListener('mousemove', (ev) => {
     var dx = mouse[0] - point[0] - 9 - (window.innerWidth - canvas.width)/2,
       dy = mouse[1] - point[1] - 9,
       rot = Math.atan2(dy, dx);
-
+    clientObject.rotate=rot;
     // p1.setrotation(rot);
     // render(ctx, 900, 600);
     socket.send(JSON.stringify(["mouse_move", {rotation:rot}]));
   }
 });
 
+//Movement listeners:
 window.addEventListener('keypress', (e) => {
 
   if (event.repeat) { return; }
 
   if (e.code === 'KeyW') {
+    clientObject.speedY=-10;
     socket.send(JSON.stringify(["key_press", "up"]));
   } else if (e.code === 'KeyD') {
-    //p1.setxSpeed(10);
+    clientObject.speedX=10;
     socket.send(JSON.stringify(["key_press", "right"]));
   } else if (e.code === 'KeyS') {
-    //p1.setySpeed(10);
+    clientObject.speedY=10;
     socket.send(JSON.stringify(["key_press", "down"]));
   } else if (e.code === 'KeyA') {
-    //p1.setxSpeed(-10);
+    clientObject.speedX=-10;
     socket.send(JSON.stringify(["key_press", "left"]));
   }
 });
 
 window.addEventListener("keyup", (e) => {
   if (e.code === 'KeyW') {
-    //p1.setySpeed(0);
+    clientObject.speedY=0;
     socket.send(JSON.stringify(["key_up", "up"]));
   } else if (e.code === 'KeyD') {
-    //p1.setxSpeed(0);
+    clientObject.speedX=0;
     socket.send(JSON.stringify(["key_up", "right"]));
   } else if (e.code === 'KeyS') {
-    //p1.setySpeed(0);
+    clientObject.speedY=0;
     socket.send(JSON.stringify(["key_up", "down"]));
   } else if (e.code === 'KeyA') {
-    //p1.setxSpeed(0);
+    clientObject.speedX=0;
     socket.send(JSON.stringify(["key_up", "left"]));
   }
 });
 
+//END OF MOVEMENT LISTENERS
 
+
+
+//Server Connection
 socket.onmessage = function(data) {
   var message = JSON.parse(data.data);
-
+  updated=true;
   if (message[0] === "init") {
     p1 = new Player(message[1].player);
+    clientObject=new clientView(p1.id);
+    
     enemy = new Enemy(message[1].enemy);
     document.getElementById("waiting").style.display = "none";
     document.getElementById("loaded").style.display = "block";
@@ -222,39 +240,60 @@ socket.onmessage = function(data) {
     }
   }
 
-  render(ctx, 900, 600);
+  
 }
 
 socket.onclose = function() {
   console.log("closed");
 }
 
-// var speed = setInterval(() => {
-//   if (p1.ySpeed === 0) {
-//     p1.x = p1.x + p1.xSpeed * 2 / 6;
-//   } else {
-//     p1.x = p1.x + p1.xSpeed * Math.sqrt(50) / 30;
-//   }
-//   if (p1.xSpeed === 0) {
-//     p1.y = p1.y + p1.ySpeed * 2 / 6;
-//   } else {
-//     p1.y = p1.y + p1.ySpeed * Math.sqrt(50) / 30;
-//   }
-//
-//   p1.face();
-//   render(ctx, 900, 600);
-// }, 25);
+//Client side rendering
+
+
+var updated = false;
+ var speed = setInterval(() => {
+   if (clientObject.speedY === 0) {
+    clientObject.x = clientObject.x + clientObject.speedX * 2 / 6;
+ } else {
+  clientObject.x = clientObject.x + clientObject.speedX * Math.sqrt(50) / 30;
+ }
+  if (clientObject.speedX === 0) {
+    clientObject.y = clientObject.y + clientObject.speedY * 2 / 6;
+ } else {
+  clientObject.y = clientObject.y + clientObject.speedY * Math.sqrt(50) / 30;
+   }
+   if(updated){
+   //Check if client differs from server:
+   if(Math.abs(clientObject.x-p1.x)>3){
+    clientObject.x=p1.x;
+   }
+   if(Math.abs(clientObject.y-p1.y)>3){
+    clientObject.y=p1.y;
+    console.log(" updateD: "+clientObject.y+" a "+clientObject.speedY);
+   
+  }
+  if(clientObject.speedX!==p1.xSpeed){
+    clientObject.speedX=p1.xSpeed;
+  }
+  if(clientObject.speedY!==p1.ySpeed){
+    clientObject.speedY=p1.ySpeed;
+  }
+  updated=false;
+   }
+  
+  render(ctx, 900, 600);
+ }, 25);
 
 
 // TODO function too big; extract smaller functions and call only them, not calling render() each time
 function render(ctx, width, height) {
   ctx.clearRect(0, 0, width, height);
-
+  let clX=clientObject.x,clY=clientObject.y, clSpeedX=clientObject.speedX, clSpeedY=clientObject.speedY, clfacing = 0, clRotation=clientObject.rotate;
   // draw the background
 
   let x = canvas.width / 2,
     y = canvas.height / 2;
-  ctx.drawImage(backgroundView, -p1.x, -p1.y);
+  ctx.drawImage(backgroundView, -clX, -clY);
 
   // draw the player
   ctx.save();
@@ -263,7 +302,7 @@ function render(ctx, width, height) {
 
   ctx.rotate(p1.facing + 90 * Math.PI / 180);
 
-  if (p1.xSpeed !== 0 || p1.ySpeed !== 0) {
+  if (clSpeedX !== 0 || clSpeedY !== 0) {
 
     ctx.drawImage(tracksImg, -65, 20, tracksImg.width * 2 / 3, tracksImg.height * 2 / 3);
     ctx.drawImage(tracksImg, -15, 20, tracksImg.width * 2 / 3, tracksImg.height * 2 / 3);
@@ -274,7 +313,7 @@ function render(ctx, width, height) {
 
   // draw the enemy
   ctx.save();
-  ctx.translate(enemy.x - p1.x + width/2 + 150, enemy.y-p1.y + height/2 + 100);
+  ctx.translate(enemy.x - clX + width/2 + 150, enemy.y-clY + height/2 + 100);
   ctx.rotate(enemy.facing + 90 * Math.PI / 180);
   if (enemy.xSpeed !== 0 || enemy.ySpeed !== 0) {
 
@@ -286,7 +325,7 @@ function render(ctx, width, height) {
 
   // draw the enemy's gun
   ctx.save();
-  ctx.translate(enemy.x - p1.x + width/2 + 150, enemy.y-p1.y + height/2 + 100);
+  ctx.translate(enemy.x - clX + width/2 + 150, enemy.y-clY + height/2 + 100);
   ctx.rotate(enemy.rotation + 90 * Math.PI / 180);
   ctx.drawImage(gun, -20, -73, gun.width * 2 / 3, gun.height * 2 / 3);
   ctx.restore();
@@ -311,10 +350,10 @@ function render(ctx, width, height) {
     ctx.save();
     if (bullets[index].id === p1.id) {
       ctx.rotate(bullets[index].rotation + 90 * Math.PI / 180);
-      ctx.drawImage(shell, -35, p1.y - bullets[index].y, shell.width * 2 / 3, shell.height * 2 / 3);
+      ctx.drawImage(shell, -35, clY - bullets[index].y, shell.width * 2 / 3, shell.height * 2 / 3);
     }
     else if (bullets[index].id === enemy.id) {
-      ctx.translate(enemy.x - p1.x, enemy.y-p1.y);
+      ctx.translate(enemy.x - clX, enemy.y-clY);
 
       ctx.rotate(bullets[index].rotation + 90 * Math.PI / 180);
       ctx.drawImage(shell, -35, enemy.y - bullets[index].y, shell.width * 2 / 3, shell.height * 2 / 3);
@@ -336,7 +375,7 @@ function render(ctx, width, height) {
   }
 
   // rotate the gun
-  ctx.rotate(p1.rotation + 90 * Math.PI / 180);
+  ctx.rotate(clRotation + 90 * Math.PI / 180);
 
   // draw the shooting animation
   if (p1.reload <= 80 && p1.reload > 78) {
