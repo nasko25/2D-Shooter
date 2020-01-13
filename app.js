@@ -155,14 +155,14 @@ wss.on("connection", function(ws) {
 		// 	}
 		// }
 		if (p1.ySpeed === 0) {
-	    p1.x = p1.x + p1.xSpeed * 2 / 6;
+	    p1.x = p1.x + p1.xSpeed * 2*4/30;
 	  } else {
-	    p1.x = p1.x + p1.xSpeed * Math.sqrt(50) / 30;
+	    p1.x = p1.x + p1.xSpeed * Math.sqrt(50)*4/150;
 	  }
 	  if (p1.xSpeed === 0) {
-	    p1.y = p1.y + p1.ySpeed * 2 / 6;
+	    p1.y = p1.y + p1.ySpeed * 2 *4/30;
 	  } else {
-	    p1.y = p1.y + p1.ySpeed * Math.sqrt(50) / 30;
+	    p1.y = p1.y + p1.ySpeed * Math.sqrt(50)*4/150;
 	  }
 
 		if ((p1.ySpeed !== 0 || p1.xSpeed !== 0)) {
@@ -179,7 +179,7 @@ wss.on("connection", function(ws) {
 		  }
 			p1.reload = Math.max(p1.reload - 1, 0);
 		});
-	}, 25);
+	}, 20);
 	ws.on("close", () => {
 		console.log("connection closed");
 		games[game_id].p1_websocket.close();
