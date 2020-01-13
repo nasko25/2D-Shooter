@@ -9,8 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "config": "^3.2.4",
     "express": "^4.17.1",
     "local-web-server": "^3.0.7",
+    "mongodb": "^3.4.1",
     "nodemon": "^2.0.2",
     "websocket": "^1.0.31",
     "ws": "^7.2.1"
