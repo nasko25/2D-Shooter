@@ -80,3 +80,63 @@ html {
 #loaded {
   display: none;
 }
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------- */
+/* sliding animation */
+#left-panel {
+  position: absolute;
+  width:50%;
+  z-index: 7;
+
+  top:0;
+  background: #181a1b;
+
+  height:100%;
+
+  left: 0;
+  animation-delay: 2s;
+  animation-duration: 1s;
+  animation-name: slideoutleft;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideoutleft {
+  from {
+    left: 0;
+  }
+
+  to {
+    left:-50%;
+  }
+}
+
+#right-panel {
+  position: fixed;
+  width:50%;
+  z-index:7;
+
+  top:0;
+  background: #181a1b;
+
+  height:100%;
+
+  right: 0;
+  animation-delay: 2s;
+  animation-duration: 1s;
+  animation-name: slideoutright;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideoutright {
+  from {
+    right: 0;
+  }
+
+  to {
+    right:-50%;
+  }
+}
+
+.slider-left {
+
+}
