@@ -34,6 +34,19 @@ html {
   color: #000000;
   background-color: #FFFFFF;
 }
+
+#btn_start:active {
+  color: #FFFFFF;
+  background-color: transparent;
+}
+
+#btn_start::before {
+  content: "→";
+}
+
+#btn_start:after {
+  content: "→";
+}
 /* for mobile */
 
 @media all and (max-width: 30em) {
