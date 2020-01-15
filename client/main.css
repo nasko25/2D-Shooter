@@ -9,6 +9,28 @@ html {
   text-align: center;
 }
 
+#on_top {
+  z-index: 8;
+  position: relative;
+  font-size: 2em;
+  transform: translateY(40vh);
+
+  animation-delay: 2s;
+  animation-duration: 1s;
+  animation-name: slide_title;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slide_title {
+  from {
+
+  }
+  to {
+    transform: unset;
+    font-size: 1em;
+  }
+}
+
 #btn_start {
   /* display: inline-block;*/
   padding: 0.7em 1.6em;
@@ -25,9 +47,12 @@ html {
   text-align: center;
   transition: all 0.2s;
   /*----------------------------------------------*/
-  position: absolute;
-  bottom: 5em;
-  right: 4em;
+  position: relative;
+  float: right;
+  margin-top: 4em;
+  margin-right: 5em;
+
+  transition: background-color 1.5s;
 }
 
 #btn_start:hover {
@@ -59,15 +84,22 @@ html {
 /* Columns */
 
 #col1, #col2, #col3 {
-  margin-left: 7%;
+  margin-left: 4%;
   border: 0.1em solid #FFFFFF;
   border-radius: 0.12em;
   float: left;
   width: 25%;
   overflow: auto;
-  height: 75vh;     /* vs 75% */
+  height: 65vh;     /* vs 75% */
 }
 
+#col1 {
+  margin-left: 8%;
+}
+
+#stats .title {
+  font-size: 1.6em;
+}
 /* #col3 {
     width: 25%;
     margin-left: 7%;
@@ -77,7 +109,7 @@ html {
 } */
 
 .list {
-  font-size: 1.5em;
+  font-size: 1.4em;
   padding-left: 2.8em;
 }
 
@@ -148,8 +180,4 @@ html {
   to {
     right:-50%;
   }
-}
-
-.slider-left {
-
 }
