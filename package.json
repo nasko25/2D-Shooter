@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "config": "^3.2.4",
+    "ejs": "^3.0.1",
     "express": "^4.17.1",
     "local-web-server": "^3.0.7",
     "mongodb": "^3.4.1",

@@ -13,8 +13,12 @@ var database = config.get("Game.dbConfig")
 
 const PORT = 8080
 
+app.set('views', __dirname + "/client");
+app.set('view engine', 'ejs');
+
 app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/client/index.html");
+	// res.sendFile(__dirname + "/client/index.html");
+	res.render("index", {games_played: 0});
 });
 app.use("/", express.static(__dirname + "/client"));
 
@@ -75,7 +79,7 @@ wss.on("connection", function(ws, req) {
 		var intv = function() {
 			mongo.connect("mongodb://" + database.user + ":" + database.pass + "@" + database.host + ":" + database.port + "/" + database.dbName, { useUnifiedTopology: true },(err, db) => {
 				if (err) throw err;
-				
+
 				db.db("game").collection("recent_games").find({}).toArray((err, result)=>{
 					var recent_games = [];
 					result.forEach((element) => {
