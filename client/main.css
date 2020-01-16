@@ -7,7 +7,7 @@ html {
 /* Initial screen */
 .title {
   text-align: center;
-  padding-left: 0;
+  padding-left: 0 !important;
 }
 
 #scoreboard {
