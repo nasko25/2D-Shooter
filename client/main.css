@@ -10,12 +10,104 @@ html {
   padding-left: 0;
 }
 
+#scoreboard {
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  top: 0;
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  clear: both;
+  right: 15%;
+  width: 20px;
+}
+
+#timerDiv {
+  position: relative;
+  margin-right: auto;
+  margin-left: auto;
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+
+#reloading {
+  position: absolute;
+  top: 70%;
+  margin-left: 45%;
+  margin-right: 40%;
+  font-size: 60px;
+  display: none;
+  animation: blink ease-out 1.8s infinite;
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes blink {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+#enemy {
+  top: 5%;
+  transition: all 1s;
+}
+
+#player {
+  top: 8%;
+  transition: all 1s;
+}
+
+#score-enemy, #score-player {
+  margin-left: 60%;
+  margin-right: 60px;
+  display: inline;
+}
+
+#score-player {
+  margin-left: 90%;
+}
+
+#player, #enemy {
+  position: fixed;
+  float: top;
+  display: flex;
+  flex-direction: row;
+  width: 100px;
+}
+
 #on_top {
   z-index: 8;
   position: relative;
   font-size: 2em;
   transform: translateY(40vh);
-
   animation-delay: 2s;
   animation-duration: 1s;
   animation-name: slide_title;
@@ -23,9 +115,8 @@ html {
 }
 
 @keyframes slide_title {
-  from {
+  from {}
 
-  }
   to {
     transform: unset;
     font-size: 1em;
@@ -52,7 +143,6 @@ html {
   float: right;
   margin-top: 4em;
   margin-right: 5em;
-
   transition: background-color 1.5s;
 }
 
@@ -73,8 +163,8 @@ html {
 #btn_start:after {
   content: "→";
 }
-/* for mobile */
 
+/* for mobile */
 @media all and (max-width: 30em) {
   #btn_start {
     display: block;
@@ -83,7 +173,6 @@ html {
 }
 
 /* Columns */
-
 #col1, #col2, #col3 {
   margin-left: 4%;
   border: 0.1em solid #FFFFFF;
@@ -91,7 +180,8 @@ html {
   float: left;
   width: 25%;
   overflow: auto;
-  height: 65vh;     /* vs 75% */
+  height: 65vh;
+  /* vs 75% */
 }
 
 #col1 {
@@ -101,6 +191,7 @@ html {
 #stats .title {
   font-size: 1.6em;
 }
+
 /* #col3 {
     width: 25%;
     margin-left: 7%;
@@ -108,7 +199,6 @@ html {
     border: 0.1em solid #FFFFFF;
     border-radius: 0.12em;
 } */
-
 .list, #stats p {
   font-size: 1.4em;
   padding-left: 2.8em;
@@ -125,6 +215,7 @@ html {
   margin-right: auto;
   display: block;
   background: white;
+  position: relative;
 }
 
 #loaded {
@@ -135,14 +226,11 @@ html {
 /* sliding animation */
 #left-panel {
   position: absolute;
-  width:50%;
+  width: 50%;
   z-index: 7;
-
-  top:0;
+  top: 0;
   background: #181a1b;
-
-  height:100%;
-
+  height: 100%;
   left: 0;
   animation-delay: 2s;
   animation-duration: 1s;
@@ -156,20 +244,17 @@ html {
   }
 
   to {
-    left:-50%;
+    left: -50%;
   }
 }
 
 #right-panel {
   position: fixed;
-  width:50%;
-  z-index:7;
-
-  top:0;
+  width: 50%;
+  z-index: 7;
+  top: 0;
   background: #181a1b;
-
-  height:100%;
-
+  height: 100%;
   right: 0;
   animation-delay: 2s;
   animation-duration: 1s;
@@ -183,6 +268,6 @@ html {
   }
 
   to {
-    right:-50%;
+    right: -50%;
   }
 }
