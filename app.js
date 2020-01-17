@@ -34,6 +34,16 @@ app.post('/winner', function (req, res) {
     // TODO add to the database
     var name = req.body[0]; // can be null!
     // name === null;
+    mongo.connect("mongodb://" + database.user + ":" + database.pass + "@" + database.host + ":" + database.port + "/" + database.dbName, {
+      useUnifiedTopology: true
+    }, (err, db) => {
+      if (err) throw err;
+      db.db("game").collection("recent_wins").insertOne({name: ((name === null) ? "anonymous" : name), time: new Date()}, (err, res) => {
+        if (err) throw err;
+        db.close();
+      });
+    });
+    // close db!
     console.log(name + " " + winner_id);
   }
   return res.end('done');
