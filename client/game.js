@@ -327,6 +327,13 @@ socket.onmessage = function(data) {
 }
 
 socket.onclose = function() {
+  if (clientObject.winner) {
+    var name = prompt("Please enter your name:", "Your name here");
+    var xhr = new window.XMLHttpRequest()
+    xhr.open('POST', '/winner', true);
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xhr.send(JSON.stringify([name]));
+  }
   console.log("closed");
 }
 

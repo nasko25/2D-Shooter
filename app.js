@@ -6,6 +6,11 @@ const url = require("url");
 const fs = require("fs");
 const ws = require("ws");
 
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: false }));
+
 const mongo = require("mongodb").MongoClient;
 
 const config = require("config");
@@ -23,6 +28,16 @@ app.get("/", (req, res) => {
   });
 });
 app.use("/", express.static(__dirname + "/client"));
+
+app.post('/winner', function (req, res) {
+  if (winner_id !== 0) {
+    // TODO add to the database
+    var name = req.body[0]; // can be null!
+    // name === null;
+    console.log(name + " " + winner_id);
+  }
+  return res.end('done');
+})
 
 server.listen(PORT);
 console.log("Server listening on port " + PORT);
@@ -86,7 +101,7 @@ function Bullet(whoShot) {
 function Game(p1, p1_websocket, game_id) {
   this.p1 = p1;
 
-  this.timer = 18000;
+  this.timer = 500//18000;
   this.p1_websocket = p1_websocket;
   this.p2 = undefined;
   this.p2_websocket = undefined;
@@ -104,6 +119,7 @@ const wss = new ws.Server({
 var games = {};
 var interval;
 // var websockets = {};
+var winner_id = 0;
 wss.on("connection", function(ws, req) {
   // if the connection comes from index.js
   if (req.url === "/") {
@@ -310,6 +326,7 @@ wss.on("connection", function(ws, req) {
           games[game_id].p2_websocket.send(JSON.stringify(["winner", {
             id: games[game_id].p2.id
           }]));
+          winner_id = p2.id;
         } else {
           games[game_id].p1_websocket.send(JSON.stringify(["winner", {
             id: games[game_id].p1.id
@@ -317,6 +334,7 @@ wss.on("connection", function(ws, req) {
           games[game_id].p2_websocket.send(JSON.stringify(["winner", {
             id: games[game_id].p1.id
           }]));
+          winner_id = p1.id;
         }
         games[game_id].p1_websocket.close();
         if (games[game_id].p2_websocket)
@@ -326,7 +344,6 @@ wss.on("connection", function(ws, req) {
         console.log("clearing the interval\n")
         clearInterval(interval);
         console.log("_________________________________\n")
-
 
       } else {
         if (games[game_id].p2 != undefined) {
