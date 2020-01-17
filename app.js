@@ -143,12 +143,14 @@ wss.on("connection", function(ws, req) {
 
         db.db("game").collection("recent_wins").find().toArray((err, result) => {
           var recent_wins = [];
+        if(result!=undefined){
           result.forEach((element) => {
             recent_wins.push({
               winner: element.name,
               time: element.time
             })
           });
+        }
           ws.send(JSON.stringify(["stats", "recent_wins", recent_wins]));
           db.close();
         });
@@ -233,14 +235,16 @@ wss.on("connection", function(ws, req) {
             y: p1.y,
             id: p1.id,
             xSpeed: p1.xSpeed,
-            ySpeed: p1.ySpeed
+            ySpeed: p1.ySpeed,
+            time: games[game_id].timer
           }]));
           games[game_id].p2_websocket.send(JSON.stringify(["move", {
             x: p1.x,
             y: p1.y,
             id: p1.id,
             xSpeed: p1.xSpeed,
-            ySpeed: p1.ySpeed
+            ySpeed: p1.ySpeed,
+            time: games[game_id].timer
           }]));
         }
         if (JSON.parse(message)[1] === "down") {
@@ -250,14 +254,16 @@ wss.on("connection", function(ws, req) {
             y: p1.y,
             id: p1.id,
             xSpeed: p1.xSpeed,
-            ySpeed: p1.ySpeed
+            ySpeed: p1.ySpeed,
+            time: games[game_id].timer
           }]));
           games[game_id].p2_websocket.send(JSON.stringify(["move", {
             x: p1.x,
             y: p1.y,
             id: p1.id,
             xSpeed: p1.xSpeed,
-            ySpeed: p1.ySpeed
+            ySpeed: p1.ySpeed,
+            time: games[game_id].timer
           }]));
         }
         if (JSON.parse(message)[1] === "left") {
@@ -267,14 +273,16 @@ wss.on("connection", function(ws, req) {
             y: p1.y,
             id: p1.id,
             xSpeed: p1.xSpeed,
-            ySpeed: p1.ySpeed
+            ySpeed: p1.ySpeed,
+            time: games[game_id].timer
           }]));
           games[game_id].p2_websocket.send(JSON.stringify(["move", {
             x: p1.x,
             y: p1.y,
             id: p1.id,
             xSpeed: p1.xSpeed,
-            ySpeed: p1.ySpeed
+            ySpeed: p1.ySpeed,
+            time: games[game_id].timer
           }]));
         }
         if (JSON.parse(message)[1] === "right") {
@@ -284,14 +292,16 @@ wss.on("connection", function(ws, req) {
             y: p1.y,
             id: p1.id,
             xSpeed: p1.xSpeed,
-            ySpeed: p1.ySpeed
+            ySpeed: p1.ySpeed,
+            time: games[game_id].timer
           }]));
           games[game_id].p2_websocket.send(JSON.stringify(["move", {
             x: p1.x,
             y: p1.y,
             id: p1.id,
             xSpeed: p1.xSpeed,
-            ySpeed: p1.ySpeed
+            ySpeed: p1.ySpeed,
+            time: games[game_id].timer
           }]));
         }
       } else if (JSON.parse(message)[0] === "shoot") {

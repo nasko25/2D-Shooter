@@ -373,9 +373,10 @@ var speed = setInterval(() => {
     updated = false;
   }
 
-  clientObject.timer = Number(clientObject.timer);
-  let minutes = clientObject.timer;
-  timerText.innerHTML = minutes + ":";
+  //clientObject.timer = Number(clientObject.timer);
+  clientObject.timer=Math.max(Number(clientObject.timer)-5 ,0);
+  let minutes = Math.floor(clientObject.timer*25/5000);
+  timerText.innerHTML =Math.floor (minutes/60)+":"+("0" + Math.floor(clientObject.timer*25/5000-Math.floor(minutes/60)*60)).slice(-2);
   render(ctx, 900, 600);
 }, 25);
 
@@ -584,3 +585,13 @@ function render(ctx, width, height) {
   }
   //p1.reload = Math.max(p1.reload - 1, 0);
 }
+
+
+document.addEventListener("webkitfullscreenchange", function (event) {
+  console.log("fuul");
+  if (window.fullscreenElement) {
+    document.getElementById("quit").requestFullscreen();
+  } else {
+      // fullscreen is cancelled
+  }
+});

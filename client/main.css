@@ -26,6 +26,8 @@ html {
 }
 
 #timerDiv {
+  width:50%;
+  text-align: center;
   position: relative;
   margin-right: auto;
   margin-left: auto;
@@ -39,8 +41,8 @@ html {
 #reloading {
   position: absolute;
   top: 70%;
-  margin-left: 45%;
-  margin-right: 40%;
+  margin-left: 42%;
+  margin-right: 42%;
   font-size: 60px;
   display: none;
   animation: blink ease-out 1.8s infinite;
@@ -49,6 +51,13 @@ html {
   -khtml-user-select: none;
   -webkit-user-select: none;
   -o-user-select: none;
+}
+#game:fullscreen{
+  margin-top: 20%;
+}
+#reloading:fullscreen{
+background-color: red;
+font-size: 5000px;
 }
 
 @keyframes blink {
@@ -90,7 +99,11 @@ html {
   margin-right: 60px;
   display: inline;
 }
-
+#lowerThird{
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+}
 #score-player {
   margin-left: 90%;
 }
@@ -123,7 +136,7 @@ html {
   }
 }
 
-#btn_start {
+#btn_start, #quit {
   /* display: inline-block;*/
   padding: 0.7em 1.6em;
   border: 0.1em solid #FFFFFF;
@@ -145,8 +158,11 @@ html {
   margin-right: 5em;
   transition: background-color 1.5s;
 }
+#quit{
+  margin-top: 1 px;
+}
 
-#btn_start:hover {
+#btn_start:hover, #quit:hover {
   color: #000000;
   background-color: #FFFFFF;
 }
@@ -269,5 +285,19 @@ html {
 
   to {
     right: -50%;
+  }
+}
+#invisible{
+  display: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media only screen and (max-width: 650px) {
+  #waiting, #game, #scoreboard, #timer, #quit{
+    display: none;
+  }
+  #invisible{
+    display:inline;
+
   }
 }
