@@ -317,6 +317,22 @@ font-size: 5000px;
   animation: spin 2s linear infinite;
 }
 
+@-moz-keyframes spin {
+  0% { transform: rotate(40deg); }
+  80%{transform: rotate(320 deg)}
+  100% {transform: rotate(400deg); }
+}
+@-webkit-keyframes spin {
+  0% { transform: rotate(40deg); }
+  80%{transform: rotate(320 deg)}
+  100% {transform: rotate(400deg); }
+}
+@keyframes spin {
+  0% { transform: rotate(40deg); }
+  80%{transform: rotate(320 deg)}
+  100% {transform: rotate(400deg); }
+}
+
 #waiting{
   position: absolute;
   top: 45%;
