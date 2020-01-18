@@ -30,9 +30,10 @@ app.get("/", (req, res) => {
 app.use("/", express.static(__dirname + "/client"));
 
 app.post('/winner', function (req, res) {
-  if (winner_id !== 0) {
+  if (winners.length !== 0) {
     // TODO add to the database
     var name = req.body[0]; // can be null!
+    var p_id = req.body[1];
     // name === null;
     mongo.connect("mongodb://" + database.user + ":" + database.pass + "@" + database.host + ":" + database.port + "/" + database.dbName, {
       useUnifiedTopology: true
@@ -51,7 +52,14 @@ app.post('/winner', function (req, res) {
         }
         //db.close();
       });
-      db.db("game").collection("recent_games").insertOne({game_id: ((game_id === null || game_id === -1) ? "none" : game_id), winner: ((name === null) ? "anonymous" : name)}, (err, res) => {
+      var game_id;
+      winners.forEach((element, index, object)=>{
+        if (element.player === p_id) {
+          game_id = element.game_id;
+          object.splice(index, 1);
+        }
+      })
+      db.db("game").collection("recent_games").insertOne({game_id: ((game_id === undefined || game_id === null || game_id === -1) ? "none" : game_id), winner: ((name === null) ? "anonymous" : name)}, (err, res) => {
         if (err) throw err;
         //db.close();
       });
@@ -122,7 +130,7 @@ function Bullet(whoShot) {
 function Game(p1, p1_websocket, game_id) {
   this.p1 = p1;
 
-  this.timer = 500//18000;
+  this.timer = 18000;
   this.p1_websocket = p1_websocket;
   this.p2 = undefined;
   this.p2_websocket = undefined;
@@ -140,8 +148,7 @@ const wss = new ws.Server({
 var games = {};
 var interval;
 // var websockets = {};
-var winner_id = 0;
-var game_id = -1;
+var winners = [];
 wss.on("connection", function(ws, req) {
   // if the connection comes from index.js
   if (req.url === "/") {
@@ -194,6 +201,7 @@ wss.on("connection", function(ws, req) {
     // TODO randomize starting positions
     var id = Math.floor(Math.random() * Math.floor(100000)).toString();
     var p1 = new Player(id);
+    var game_id;
     // first ever game on the server
     if (Object.entries(games).length === 0 && games.constructor === Object) {
       game_id = Math.floor(Math.random() * Math.floor(100000)).toString();
@@ -349,7 +357,7 @@ wss.on("connection", function(ws, req) {
       var dist = 40;
       var sphere1X, sphere1Y, sphere2X, sphere2Y;
       var circ1X, circ1Y, circ2X, circ2Y;
-      if (games[game_id].timer < 4) {
+      if (games[game_id].timer < 3) {
         if (games[game_id].p1.killCount > games[game_id].p2.killCount) {
           games[game_id].p1_websocket.send(JSON.stringify(["winner", {
             id: games[game_id].p2.id
@@ -357,7 +365,7 @@ wss.on("connection", function(ws, req) {
           games[game_id].p2_websocket.send(JSON.stringify(["winner", {
             id: games[game_id].p2.id
           }]));
-          winner_id = p2.id;
+          winners.push({player:games[game_id].p2.id, game_id:game_id});
         } else {
           games[game_id].p1_websocket.send(JSON.stringify(["winner", {
             id: games[game_id].p1.id
@@ -365,7 +373,7 @@ wss.on("connection", function(ws, req) {
           games[game_id].p2_websocket.send(JSON.stringify(["winner", {
             id: games[game_id].p1.id
           }]));
-          winner_id = p1.id;
+          winners.push({player:games[game_id].p1.id, game_id:game_id});
         }
         games[game_id].p1_websocket.close();
         if (games[game_id].p2_websocket)
@@ -378,7 +386,7 @@ wss.on("connection", function(ws, req) {
 
       } else {
         if (games[game_id].p2 != undefined) {
-          games[game_id].timer -= 4;
+          games[game_id].timer -= 2;
 
           /*if(games[game_id].p1.facing*180/Math.PI===-180){
           	sphere1X=games[game_id].p1.x-dist;

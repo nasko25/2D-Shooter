@@ -332,7 +332,7 @@ socket.onclose = function() {
     var xhr = new window.XMLHttpRequest()
     xhr.open('POST', '/winner', true);
     xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    xhr.send(JSON.stringify([name]));
+    xhr.send(JSON.stringify([name, p1.id]));
   }
   console.log("closed");
 }
