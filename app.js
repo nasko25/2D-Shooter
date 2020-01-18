@@ -40,11 +40,22 @@ app.post('/winner', function (req, res) {
       if (err) throw err;
       db.db("game").collection("recent_wins").insertOne({name: ((name === null) ? "anonymous" : name), time: new Date()}, (err, res) => {
         if (err) throw err;
-        db.close();
+        //db.close();
+      });
+      db.db("game").collection("recent_wins").find().count((err, res) => {
+        if (res > 7) {
+          db.db("game").collection("recent_wins").find().sort({time: 1}).toArray((err, result)=>{
+            var id = result[0]["_id"];
+            db.db("game").collection("recent_wins").deleteOne({_id: id});
+          });
+        }
+        //db.close();
+      });
+      db.db("game").collection("recent_games").insertOne({game_id: ((game_id === null || game_id === -1) ? "none" : game_id), winner: ((name === null) ? "anonymous" : name)}, (err, res) => {
+        if (err) throw err;
+        //db.close();
       });
     });
-    // close db!
-    console.log(name + " " + winner_id);
   }
   return res.end('done');
 })
@@ -130,6 +141,7 @@ var games = {};
 var interval;
 // var websockets = {};
 var winner_id = 0;
+var game_id = -1;
 wss.on("connection", function(ws, req) {
   // if the connection comes from index.js
   if (req.url === "/") {
@@ -182,7 +194,6 @@ wss.on("connection", function(ws, req) {
     // TODO randomize starting positions
     var id = Math.floor(Math.random() * Math.floor(100000)).toString();
     var p1 = new Player(id);
-    var game_id;
     // first ever game on the server
     if (Object.entries(games).length === 0 && games.constructor === Object) {
       game_id = Math.floor(Math.random() * Math.floor(100000)).toString();
