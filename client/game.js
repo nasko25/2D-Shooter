@@ -378,7 +378,7 @@ var speed = setInterval(() => {
   clientObject.timer=Math.max(Number(clientObject.timer)-5 ,0);
   let minutes = Math.floor(clientObject.timer*25/5000);
   timerText.innerHTML =Math.floor (minutes/60)+":"+("0" + Math.floor(clientObject.timer*25/5000-Math.floor(minutes/60)*60)).slice(-2);
-  render(ctx, 900, 600);
+  render(ctx, 1200, 800);
 }, 25);
 
 
