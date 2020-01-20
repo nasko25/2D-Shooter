@@ -136,7 +136,7 @@ font-size: 5000px;
   }
 }
 
-#btn_start, #quit {
+#btn_start, #quit, #btn_desc, #btn_back {
   /* display: inline-block;*/
   padding: 0.7em 1.6em;
   border: 0.1em solid #FFFFFF;
@@ -162,17 +162,17 @@ font-size: 5000px;
   margin-top: 1 px;
 }
 
-#btn_start:hover, #quit:hover {
+#btn_start:hover, #quit:hover, #btn_desc:hover, #btn_back:hover {
   color: #000000;
   background-color: #FFFFFF;
 }
 
-#btn_start:active {
+#btn_start:active, #btn_desc:active, #btn_back:active {
   color: #FFFFFF;
   background-color: transparent;
 }
 
-#btn_start::before {
+#btn_start:before {
   content: "→";
 }
 
@@ -342,4 +342,25 @@ font-size: 5000px;
   width: 500px;
   height: 100px;
   text-align: left;
+}
+
+/* description page */
+#description {
+  text-align: center;
+  height: 65vh;
+}
+
+#description h1 {
+  font-size: 3em;
+  margin-top: 5%;
+}
+
+#description p {
+  font-size: 1.3em;
+  margin: 13% 30% 0 30%;
+}
+
+#btn_back {
+  margin-top: 2.8%;
+  margin-right: 10%;
 }

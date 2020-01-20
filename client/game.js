@@ -378,14 +378,14 @@ var speed = setInterval(() => {
   clientObject.timer=Math.max(Number(clientObject.timer)-5 ,0);
   let minutes = Math.floor(clientObject.timer*25/5000);
   timerText.innerHTML =Math.floor (minutes/60)+":"+("0" + Math.floor(clientObject.timer*25/5000-Math.floor(minutes/60)*60)).slice(-2);
-  render(ctx, 1200, 800);
+  render(ctx, 900, 600);
 }, 25);
 
 
 // TODO function too big; extract smaller functions and call only them, not calling render() each time
 function render(ctx, width, height) {
 
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, 1200, 800);
   let clX = clientObject.x,
     clY = clientObject.y,
     clSpeedX = clientObject.speedX,

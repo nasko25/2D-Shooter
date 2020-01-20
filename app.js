@@ -197,7 +197,7 @@ wss.on("connection", function(ws, req) {
           db.close();
         });
 
-        db.db("game").collection("recent_wins").find().toArray((err, result) => {
+        db.db("game").collection("recent_wins").find().sort({time: -1}).toArray((err, result) => {
           var recent_wins = [];
         if(result!=undefined){
           result.forEach((element) => {
