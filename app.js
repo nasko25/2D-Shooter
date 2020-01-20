@@ -361,7 +361,7 @@ wss.on("connection", function(ws, req) {
           }]));
         }
       } else if (JSON.parse(message)[0] === "shoot") {
-        if (p1.reload <= 0) {
+        if (p1.reload <= 0 && p1.respawn < 3) {
           var dx = JSON.parse(message)[1].dx;
           var dy = JSON.parse(message)[1].dy;
           var hyp = JSON.parse(message)[1].hyp;
