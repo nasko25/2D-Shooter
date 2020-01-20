@@ -328,11 +328,12 @@ socket.onmessage = function(data) {
 
 socket.onclose = function() {
   if (clientObject.winner) {
+    setTimeout(() => {
     var name = prompt("Please enter your name:", "Your name here");
     var xhr = new window.XMLHttpRequest()
     xhr.open('POST', '/winner', true);
     xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    xhr.send(JSON.stringify([name, p1.id]));
+    xhr.send(JSON.stringify([name, p1.id]));}, 200);
   }
   console.log("closed");
 }
@@ -576,6 +577,7 @@ function render(ctx, width, height) {
       } else {
         ctx.translate(x - 50, y);
         ctx.font = '48px serif';
+        console.log(clientObject.winner)
         ctx.fillText('You lost!', 10, 50);
       }
 

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8"/>
     <link rel="stylesheet" type="text/css" href="main.css">
+    <title> asdf </title>
   </head>
   <body>
 
@@ -10,7 +11,7 @@
     <div id = "right-panel"> </div>
 
     <div class = "title" id = "on_top">
-      <h1> THIS IS A TEST </h1>
+      <h1> ASDF </h1>
     </div>
 
     <div id = "stats">
@@ -31,7 +32,7 @@
           <li> 3 </li>
           <li> 4 </li>
         </ul>
-        <p> <%= (games_played === 0) ? "" : "You have played at least " + games_played + " games." %>
+        <p> <%= (games_played == 0 || games_played === undefined) ? "" : "You have played at least " + games_played + " game(s)." %>
         </p>
       </div>
       <div id = "col3">

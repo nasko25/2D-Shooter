@@ -6,10 +6,9 @@ const url = require("url");
 const fs = require("fs");
 const ws = require("ws");
 
-var bodyParser = require('body-parser');
+const cook_parse = require("cookie-parser")
 
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: false }));
+var bodyParser = require('body-parser');
 
 const mongo = require("mongodb").MongoClient;
 
@@ -18,14 +17,42 @@ var database = config.get("Game.dbConfig")
 
 const PORT = 8080
 
+app.use(cook_parse());
+
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// set cookies
+// app.use((req, res, next) => {
+//   var cookie = req.cookies.times_accessed;
+//   if (cookie === undefined) {
+//     res.cookie("times_accessed", 0);
+//   }
+//   else if (req.originalUrl === "/"){
+//     cookie = parseInt(cookie)+1;
+//     console.log(req.originalUrl)
+//     res.cookie("times_accessed", cookie);
+//   }
+//   next();
+// });
+
 app.set('views', __dirname + "/client");
 app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
   // res.sendFile(__dirname + "/client/index.html");
+  var cookie = req.cookies.times_accessed;
   res.render("index", {
-    games_played: 0
+    games_played: cookie
   });
+});
+app.get("/game.html", (req, res) => {
+  var cookie = req.cookies.times_accessed;
+  if (cookie === undefined)
+    res.cookie("times_accessed", 0);
+  else if (req.originalUrl === "/game.html")
+    res.cookie("times_accessed", parseInt(cookie) + 1);
+  res.sendFile(__dirname + "/client/game.html");
 });
 app.use("/", express.static(__dirname + "/client"));
 
@@ -493,10 +520,10 @@ wss.on("connection", function(ws, req) {
           }
           if (p1.xSpeed === 0) {
             p1.y = Math.max(p1.y + p1.ySpeed * 2 * 4 / 30, 1000);
-            p1.y = Math.min(p1.y, 3000);
+            p1.y = Math.min(p1.y, 2940);
           } else {
             p1.y = Math.max(p1.y + p1.ySpeed * Math.sqrt(50) * 4 / 150, 1000);
-            p1.y = Math.min(p1.y, 3000);
+            p1.y = Math.min(p1.y, 2940);
           }
 
           if ((p1.ySpeed !== 0 || p1.xSpeed !== 0)) {
