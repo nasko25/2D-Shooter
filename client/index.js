@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://localhost:8080/");
+var socket = new WebSocket("ws://tanktack.herokuapp.com:8080/");
 
 socket.onmessage = function(data) {
   var message = JSON.parse(data.data);

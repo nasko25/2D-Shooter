@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://localhost:8080/game.js");
+var socket = new WebSocket("ws://tanktack.herokuapp.com:8080/game.js");
 
 var canvas = document.getElementById("game");
 canvas.onselectstart = function() {
