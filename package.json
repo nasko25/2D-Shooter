@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.606.0",
     "config": "^3.2.4",
     "cookie-parser": "^1.4.4",
     "ejs": "^3.0.1",

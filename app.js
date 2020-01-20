@@ -12,8 +12,18 @@ var bodyParser = require('body-parser');
 
 const mongo = require("mongodb").MongoClient;
 
-const config = require("config");
-var database = config.get("Game.dbConfig")
+// const config = require("config");
+// var database = config.get("Game.dbConfig")
+const config = require('aws-sdk');
+
+let database = new config.S3({
+  user:process.env.USER,
+  pass: process.env.PASS,
+  host:process.env.HOST ,
+  port: process.env.PORT,
+  dbName: process.env.DBNAME
+});
+database = database.config;
 
 const PORT = 8080
 
