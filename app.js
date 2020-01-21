@@ -173,7 +173,7 @@ function Game(p1, p1_websocket, game_id) {
   this.p2_websocket = undefined;
   this.id = game_id;
   this.waiting_for_players = true;
-  this.closed = 0;
+  this.closed = 1;
   this.bullets = [];
 }
 
@@ -250,6 +250,8 @@ wss.on("connection", function(ws, req) {
           p1.x = Math.floor((Math.random() * 500) + 2000);
           p1.y = Math.floor((Math.random() * 500) + 2000);
           games[game].p2 = p1;
+
+          games[game].closed = 0;
 
           games[game].p2_websocket = ws;
           games[game].waiting_for_players = false;
@@ -660,6 +662,7 @@ wss.on("connection", function(ws, req) {
     }, 20);
     ws.on("close", () => {
       console.log("connection closed");
+      games[game_id].waiting_for_players = false;   // fixes a race condition that happens when refreshing the browser (the player connects to his own game)
       games[game_id].p1_websocket.close();
       if (games[game_id].p2_websocket)
         games[game_id].p2_websocket.close();
