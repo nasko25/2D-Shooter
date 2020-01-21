@@ -59,9 +59,9 @@ app.get("/", (req, res) => {
 app.get("/game.html", (req, res) => {
   var cookie = req.cookies.times_accessed;
   if (cookie === undefined)
-    res.cookie("times_accessed", 0);
+    res.cookie("times_accessed", 0); //, {domain:"<url>", path:"/"});
   else if (req.originalUrl === "/game.html")
-    res.cookie("times_accessed", parseInt(cookie) + 1);
+    res.cookie("times_accessed", parseInt(cookie) + 1); //, {domain:"<url here>", path:"/"});
   res.sendFile(__dirname + "/client/game.html");
 });
 app.use("/", express.static(__dirname + "/client"));

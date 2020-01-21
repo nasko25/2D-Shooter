@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://tanktack.herokuapp.com:8080/game.js");
+var socket = new WebSocket("ws://localhost:8080/game.js");
 
 var canvas = document.getElementById("game");
 canvas.onselectstart = function() {
@@ -335,6 +335,24 @@ socket.onclose = function() {
     xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
     xhr.send(JSON.stringify([name, p1.id]));}, 200);
   }
+  else if (clientObject.timer > 1) {
+    clearInterval(speed);
+    ctx.save();
+    clientObject.renderAlpha = (Math.min(clientObject.renderAlpha + 0.01), 0.7);
+    ctx.beginPath();
+    ctx.rect(-10, -10, 1300, 900);
+    ctx.fillStyle = "rgba(0, 0, 0, " + clientObject.renderAlpha + ")";
+    ctx.stroke();
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle = "rgba(255,255,255,1)";
+    ctx.translate(canvas.width / 2 - 300, canvas.height / 2);
+    ctx.font = '48px serif';
+    console.log(clientObject.winner)
+    ctx.fillText('The other player disconnected', 10, 50);
+    ctx.restore();
+  }
   console.log("closed");
 }
 
@@ -589,11 +607,16 @@ function render(ctx, width, height) {
 }
 
 
-document.addEventListener("webkitfullscreenchange", function (event) {
-  console.log("fuul");
-  if (window.fullscreenElement) {
-    document.getElementById("quit").requestFullscreen();
-  } else {
-      // fullscreen is cancelled
-  }
-});
+// document.getElementById('fullscreen').addEventListener('click', function () {
+//     var elem = document.getElementsByTagName("body")[0];
+//     //elem.webkitRequestFullscreen();
+//     if (elem.requestFullscreen) {
+//         elem.requestFullscreen();
+//     } else if (elem.msRequestFullscreen) {
+//         elem.msRequestFullscreen();
+//     } else if (elem.mozRequestFullScreen) {
+//         elem.mozRequestFullScreen();
+//     } else if (elem.webkitRequestFullscreen) {
+//         elem.webkitRequestFullscreen();
+//     }
+// });
