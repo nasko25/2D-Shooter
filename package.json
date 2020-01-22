@@ -17,6 +17,7 @@
     "local-web-server": "^3.0.7",
     "mongodb": "^3.4.1",
     "nodemon": "^2.0.2",
+    "sanitize-html": "^1.21.1",
     "websocket": "^1.0.31",
     "ws": "^7.2.1"
   }

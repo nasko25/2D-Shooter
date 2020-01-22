@@ -66,11 +66,15 @@ app.get("/game.html", (req, res) => {
 });
 app.use("/", express.static(__dirname + "/client"));
 
+var sanitize = require('sanitize-html');
+
 app.post('/winner', function (req, res) {
   if (winners.length !== 0) {
     // TODO add to the database
     var name = req.body[0]; // can be null!
     var p_id = req.body[1];
+    name = sanitize(name, { allowedTags: [],allowedAttributes: {}});
+    console.log(name);
     // name === null;
     mongo.connect("mongodb://" + database.user + ":" + database.pass + "@" + database.host + ":" + database.port + "/" + database.dbName, {
       useUnifiedTopology: true
