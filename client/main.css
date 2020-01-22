@@ -364,3 +364,12 @@ font-size: 5000px;
   margin-top: 2.8%;
   margin-right: 10%;
 }
+
+@media all and (display-mode: fullscreen) {
+  body {
+    margin-top: 6%;
+  }
+  #btn_start {
+    background-color: red;
+  }
+}
